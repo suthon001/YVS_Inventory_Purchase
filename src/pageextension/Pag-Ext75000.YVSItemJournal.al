@@ -311,8 +311,9 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
     }
     trigger OnOpenPage()
     begin
-        if gvDocument <> '' then
-            rec.SetRange("Line No.", gvLineNo);
+        if not gvIsBatch then
+            if gvDocument <> '' then
+                rec.SetRange("Line No.", gvLineNo);
     end;
     /// <summary>
     /// SetDocumnet.
@@ -321,14 +322,17 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
     /// <param name="pBatchName">code[10].</param>
     /// <param name="pDocument">code[20].</param>
     /// <param name="pLineNo">Integer.</param>
-    procedure SetDocumnet(pTemplateName: code[10]; pBatchName: code[10]; pDocument: code[20]; pLineNo: Integer)
+    /// <param name="pIsBatch">Boolean.</param>
+    procedure SetDocumnet(pTemplateName: code[10]; pBatchName: code[10]; pDocument: code[20]; pLineNo: Integer; pIsBatch: Boolean)
     begin
         gvTemplateName := pTemplateName;
         gvBatchName := pBatchName;
         gvDocument := pDocument;
         gvLineNo := pLineNo;
+        gvIsBatch := pIsBatch;
         rec.SetRange("Journal Template Name", gvTemplateName);
         rec.SetRange("Journal Batch Name", gvBatchName);
+        rec.SetRange("YVS Status", rec."YVS Status"::"Pending Approval");
     end;
 
     trigger OnAfterGetRecord()
@@ -379,4 +383,5 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
         gvDocument: code[20];
         gvBatchName, gvTemplateName : code[10];
         gvLineNo: Integer;
+        gvIsBatch: Boolean;
 }

@@ -18,7 +18,7 @@ codeunit 75000 "YVS Inven & Purchase Func"
             if ItemJournalLine.FindFirst() then begin
                 ItemJournal.SetRecord(ItemJournalLine);
                 ItemJournal.SetDocumnet(ApprovalEntry."YVS Ref. Journal Template Name", ApprovalEntry."YVS Ref. Journal Batch Name", ApprovalEntry."YVS Ref. Journal Document No.",
-                ApprovalEntry."YVS Ref. Journal Line No.");
+                ApprovalEntry."YVS Ref. Journal Line No.", ApprovalEntry."YVS Is Batch");
                 ItemJournal.Run();
                 CLEAR(ItemJournal);
             end;
