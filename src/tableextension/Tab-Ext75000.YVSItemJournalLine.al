@@ -55,6 +55,7 @@ tableextension 75000 "YVS Item Journal Line" extends "Item Journal Line"
     /// </summary>
     procedure CheckBeforRelease()
     begin
+
         if IsItemItemJournalEnabled(rec) then
             Error(Text002Msg);
     end;
