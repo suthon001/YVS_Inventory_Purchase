@@ -1,0 +1,35 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "DemoTH",
+            "request": "launch",
+            "type": "al",
+            "environmentType": "Sandbox",
+            "environmentName": "DemoTH",
+            "startupObjectId": 22,
+            "startupObjectType": "Page",
+            "breakOnError": true,
+            "launchBrowser": true,
+            "enableLongRunningSqlStatements": true,
+            "schemaUpdateMode": "ForceSync",
+            "enableSqlInformationDebugger": true,
+            "tenant": "c82c348b-64ef-4a07-bfa7-62fc88bc1517"
+        },
+        {
+            "name": "HH",
+            "request": "launch",
+            "type": "al",
+            "environmentType": "Sandbox",
+            "environmentName": "DEV",
+            "startupObjectId": 22,
+            "startupObjectType": "Page",
+            "breakOnError": true,
+            "launchBrowser": true,
+            "enableLongRunningSqlStatements": true,
+            "schemaUpdateMode": "ForceSync",
+            "enableSqlInformationDebugger": true,
+            "tenant": "4ef4cef4-feda-4adf-a799-109703e11237"
+        }
+    ]
+}
