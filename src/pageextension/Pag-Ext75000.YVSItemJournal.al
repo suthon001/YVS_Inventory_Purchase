@@ -221,7 +221,7 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
                             Enabled = (CancancelApprovalForrecordBatch OR CanRequstApprovelForFlowBatch) AND (OpenApprovalEntriesExistBatch);
                             Image = CancelApprovalRequest;
                             ApplicationArea = all;
-                            Caption = 'Cancel Approval Request';
+                            Caption = 'Journal Batch';
                             ToolTip = 'Executes the Cancel Approval Request action.';
                             trigger OnAction()
                             var
@@ -239,7 +239,7 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
                             Enabled = (CancancelApprovalForrecord OR CanRequstApprovelForFlow) AND (OpenApprovalEntriesExist);
                             Image = CancelApprovalRequest;
                             ApplicationArea = all;
-                            Caption = 'Cancel Approval Request';
+                            Caption = 'Journal by Line';
                             ToolTip = 'Executes the Cancel Approval Request action.';
                             trigger OnAction()
                             begin
