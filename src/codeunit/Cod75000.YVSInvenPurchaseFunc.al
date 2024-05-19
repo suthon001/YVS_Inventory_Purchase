@@ -35,7 +35,7 @@ codeunit 75000 "YVS Inven & Purchase Func"
     var
         JournalBatch: record "Item Journal Batch";
     begin
-        IF ItemJournalLine."YVS Status" IN [ItemJournalLine."YVS Status"::Released] THEN
+        IF ItemJournalLine."YVS Approve Status" IN [ItemJournalLine."YVS Approve Status"::Released] THEN
             EXIT;
         JournalBatch.reset();
         JournalBatch.SetRange("Journal Template Name", ItemJournalLine."Journal Template Name");
@@ -50,7 +50,7 @@ codeunit 75000 "YVS Inven & Purchase Func"
         ItemJournalLine.TestField("Item No.");
         ItemJournalLine.TestField("Location Code");
         ItemJournalLine.TestField(Quantity);
-        ItemJournalLine."YVS Status" := ItemJournalLine."YVS Status"::Released;
+        ItemJournalLine."YVS Approve Status" := ItemJournalLine."YVS Approve Status"::Released;
         ItemJournalLine.MODIFY();
     end;
 
@@ -60,19 +60,12 @@ codeunit 75000 "YVS Inven & Purchase Func"
     /// </summary>
     /// <param name="ItemJournalLine">VAR Record "Item Journal Line".</param>
     procedure "ReopenBilling"(var ItemJournalLine: Record "Item Journal Line")
-    var
-        JournalBatch: record "Item Journal Batch";
     begin
-        IF ItemJournalLine."YVS Status" in [ItemJournalLine."YVS Status"::Open] THEN
+        IF ItemJournalLine."YVS Approve Status" in [ItemJournalLine."YVS Approve Status"::Open] THEN
             EXIT;
-        JournalBatch.reset();
-        JournalBatch.SetRange("Journal Template Name", ItemJournalLine."Journal Template Name");
-        JournalBatch.SetRange(Name, ItemJournalLine."Journal Batch Name");
-        if JournalBatch.FindFirst() then
-            JournalBatch.CheckbeforReOpen();
 
         ItemJournalLine.CheckbeforReOpen();
-        ItemJournalLine."YVS Status" := ItemJournalLine."YVS Status"::Open;
+        ItemJournalLine."YVS Approve Status" := ItemJournalLine."YVS Approve Status"::Open;
         ItemJournalLine."YVS Is Batch" := false;
         ItemJournalLine.MODIFY();
     end;
@@ -240,23 +233,31 @@ codeunit 75000 "YVS Inven & Purchase Func"
             DATABASE::"Item Journal Line":
                 begin
                     RecRef.SetTable(ItemJournalLines);
-                    ItemJournalLines."YVS Status" := ItemJournalLines."YVS Status"::"Pending Approval";
+                    ItemJournalLines."YVS Approve Status" := ItemJournalLines."YVS Approve Status"::"Pending Approval";
+                    ItemJournalLines."YVS Is Batch" := false;
                     ItemJournalLines.Modify();
                     IsHandled := true;
                 end;
             DATABASE::"Item Journal Batch":
                 begin
                     RecRef.SetTable(ItemJournalBatch);
-                    ItemJournalBatch."YVS Status" := ItemJournalBatch."YVS Status"::"Pending Approval";
-                    ItemJournalBatch.Modify();
                     ItemJournalLines.reset();
                     ItemJournalLines.SetRange("Journal Template Name", ItemJournalBatch."Journal Template Name");
                     ItemJournalLines.SetRange("Journal Batch Name", ItemJournalBatch.Name);
-                    ItemJournalLines.SetRange("YVS Status", ItemJournalLines."YVS Status"::Open);
-                    if ItemJournalLines.FindFirst() then begin
-                        ItemJournalLines.ModifyALL("YVS Is Batch", true);
-                        ItemJournalLines.ModifyALL("YVS Status", ItemJournalLines."YVS Status"::"Pending Approval");
-                    end;
+                    ItemJournalLines.SetFilter("Posting Date", '<>%1', 0D);
+                    ItemJournalLines.SetFilter("Document Date", '<>%1', 0D);
+                    ItemJournalLines.SetFilter("Document No.", '<>%1', '');
+                    ItemJournalLines.SetFilter("Item No.", '<>%1', '');
+                    ItemJournalLines.SetFilter("Location Code", '<>%1', '');
+                    ItemJournalLines.SetFilter("Quantity", '<>%1', 0);
+                    ItemJournalLines.SetRange("YVS Approve Status", ItemJournalLines."YVS Approve Status"::Open);
+                    if ItemJournalLines.FindSet() then
+                        repeat
+                            ItemJournalLines."YVS Approve Status" := ItemJournalLines."YVS Approve Status"::"Pending Approval";
+                            ItemJournalLines."YVS Is Batch" := true;
+                            ItemJournalLines.Modify();
+                        until ItemJournalLines.next() = 0;
+                    IsHandled := true;
                 end;
 
         end;
@@ -272,24 +273,27 @@ codeunit 75000 "YVS Inven & Purchase Func"
             DATABASE::"Item Journal Line":
                 begin
                     RecRef.SetTable(ItemJournalLines);
-                    ItemJournalLines."YVS Status" := ItemJournalLines."YVS Status"::Released;
+                    ItemJournalLines."YVS Approve Status" := ItemJournalLines."YVS Approve Status"::Released;
                     ItemJournalLines.Modify();
+                    Handled := true;
                 end;
             DATABASE::"Item Journal Batch":
                 begin
                     RecRef.SetTable(ItemJournalBatch);
-                    ItemJournalBatch."YVS Status" := ItemJournalBatch."YVS Status"::Open;
-                    ItemJournalBatch.Modify();
                     ItemJournalLines.reset();
                     ItemJournalLines.SetRange("Journal Template Name", ItemJournalBatch."Journal Template Name");
                     ItemJournalLines.SetRange("Journal Batch Name", ItemJournalBatch.Name);
-                    ItemJournalLines.SetRange("YVS Status", ItemJournalLines."YVS Status"::"Pending Approval");
+                    ItemJournalLines.SetRange("YVS Approve Status", ItemJournalLines."YVS Approve Status"::"Pending Approval");
                     ItemJournalLines.SetRange("YVS Is Batch", true);
-                    if ItemJournalLines.FindFirst() then
-                        ItemJournalLines.ModifyALL("YVS Status", ItemJournalLines."YVS Status"::Released);
+                    if ItemJournalLines.FindSet() then
+                        repeat
+                            ItemJournalLines."YVS Approve Status" := ItemJournalLines."YVS Approve Status"::Released;
+                            ItemJournalLines.Modify();
+                        until ItemJournalLines.next() = 0;
+                    Handled := true;
                 end;
         end;
-        Handled := true;
+
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Workflow Response Handling", 'OnOpenDocument', '', false, false)]
@@ -303,24 +307,26 @@ codeunit 75000 "YVS Inven & Purchase Func"
             DATABASE::"Item Journal Line":
                 begin
                     RecRef.SetTable(ItemJournalLines);
-                    ItemJournalLines."YVS Status" := ItemJournalLines."YVS Status"::Open;
+                    ItemJournalLines."YVS Approve Status" := ItemJournalLines."YVS Approve Status"::Open;
+                    ItemJournalLines."YVS Is Batch" := false;
                     ItemJournalLines.Modify();
                     Handled := true;
                 END;
             DATABASE::"Item Journal Batch":
                 begin
                     RecRef.SetTable(ItemJournalBatch);
-                    ItemJournalBatch."YVS Status" := ItemJournalBatch."YVS Status"::Open;
-                    ItemJournalBatch.Modify();
                     ItemJournalLines.reset();
                     ItemJournalLines.SetRange("Journal Template Name", ItemJournalBatch."Journal Template Name");
                     ItemJournalLines.SetRange("Journal Batch Name", ItemJournalBatch.Name);
-                    ItemJournalLines.SetRange("YVS Status", ItemJournalLines."YVS Status"::"Pending Approval");
+                    ItemJournalLines.SetRange("YVS Approve Status", ItemJournalLines."YVS Approve Status"::"Pending Approval");
                     ItemJournalLines.SetRange("YVS Is Batch", true);
-                    if ItemJournalLines.FindFirst() then begin
-                        ItemJournalLines.ModifyALL("YVS Status", ItemJournalLines."YVS Status"::Open);
-                        ItemJournalLines.ModifyAll("YVS Is Batch", false);
-                    end;
+                    if ItemJournalLines.FindSet() then
+                        repeat
+                            ItemJournalLines."YVS Approve Status" := ItemJournalLines."YVS Approve Status"::Open;
+                            ItemJournalLines."YVS Is Batch" := false;
+                            ItemJournalLines.Modify();
+                        until ItemJournalLines.next() = 0;
+                    Handled := true;
                 end;
         end;
     END;
@@ -369,9 +375,11 @@ codeunit 75000 "YVS Inven & Purchase Func"
                     ItemJournalLine.reset();
                     ItemJournalLine.SetRange("Journal Template Name", ItemJournalBatch."Journal Template Name");
                     ItemJournalLine.SetRange("Journal Batch Name", ItemJournalBatch.Name);
-                    ItemJournalLine.SetRange("YVS Status", ItemJournalLine."YVS Status"::Open);
-                    ItemJournalLine.CalcSums(Quantity);
+                    ItemJournalLine.SetRange("YVS Approve Status", ItemJournalLine."YVS Approve Status"::Open);
+                    ItemJournalLine.CalcSums(Quantity, Amount, "Amount (ACY)");
                     ApprovalEntryArgument."YVS Ref. Journal Quantity" := ItemJournalLine.Quantity;
+                    ApprovalEntryArgument.Amount := ItemJournalLine.Amount;
+                    ApprovalEntryArgument."Amount (LCY)" := ItemJournalLine."Amount (ACY)";
                 end;
 
         end;
@@ -464,9 +472,9 @@ codeunit 75000 "YVS Inven & Purchase Func"
 
         WorkflowSetup.InsertDocApprovalWorkflowSteps(
       workflow,
-      BuildItemJournalLineCondition(ItemJournalLine."YVS Status"::Open),
+      BuildItemJournalLineCondition(ItemJournalLine."YVS Approve Status"::Open),
       RunWorkflowOnSendItemJournalLineApprovalCode(),
-       BuildItemJournalLineCondition(ItemJournalLine."YVS Status"::"Pending Approval"),
+       BuildItemJournalLineCondition(ItemJournalLine."YVS Approve Status"::"Pending Approval"),
        RunWorkflowOnCancelItemJournalLineApprovalCode(),
         WorkflowSetpArgument,
        TRUE
@@ -479,7 +487,6 @@ codeunit 75000 "YVS Inven & Purchase Func"
 
         WorkflowSetpArgument: Record "Workflow Step Argument";
         blankDateFormula: DateFormula;
-        ItemJournalBatch: Record "Item Journal Batch";
         WorkflowSetup: Codeunit "Workflow Setup";
     begin
         WorkflowSetup.InitWorkflowStepArgument(WorkflowSetpArgument,
@@ -488,9 +495,9 @@ codeunit 75000 "YVS Inven & Purchase Func"
 
         WorkflowSetup.InsertDocApprovalWorkflowSteps(
       workflow,
-      BuildItemJournalBatchCondition(ItemJournalBatch."YVS Status"::Open),
+      BuildItemJournalBatchCondition(),
       RunWorkflowOnSendItemJournalBatchApprovalCode(),
-       BuildItemJournalBatchCondition(ItemJournalBatch."YVS Status"::"Pending Approval"),
+       BuildItemJournalBatchCondition(),
        RunWorkflowOnCancelItemJournalBatchApprovalCode(),
         WorkflowSetpArgument,
        TRUE
@@ -572,16 +579,20 @@ codeunit 75000 "YVS Inven & Purchase Func"
         ItemJournalLine: Record "Item Journal Line";
         workflowSetup: Codeunit "Workflow Setup";
     begin
-        ItemJournalLine.SetRange("YVS Status", Status);
+        ItemJournalLine.SetRange("Journal Template Name");
+        ItemJournalLine.SetRange("Journal Batch Name");
+        ItemJournalLine.SetRange("Entry Type");
+        ItemJournalLine.SetRange("YVS Approve Status", Status);
         exit(StrSubstNo(ItemJournalLineConditionTxt, workflowSetup.Encode(ItemJournalLine.GetView(false))));
     end;
 
-    local procedure BuildItemJournalBatchCondition(Status: Enum "YVS Item Journal Doc. Status"): Text
+    local procedure BuildItemJournalBatchCondition(): Text
     var
         ItemJournalBatch: Record "Item Journal Batch";
         workflowSetup: Codeunit "Workflow Setup";
     begin
-        ItemJournalBatch.SetRange("YVS Status", Status);
+        ItemJournalBatch.SetRange("Journal Template Name");
+        ItemJournalBatch.SetRange(Name);
         exit(StrSubstNo(ItemJournalBatchConditionTxt, workflowSetup.Encode(ItemJournalBatch.GetView(false))));
     end;
 

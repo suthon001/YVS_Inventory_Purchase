@@ -7,7 +7,7 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
     {
         addfirst(Control1)
         {
-            field("YVS Status"; Rec."YVS Status")
+            field("YVS Approve Status"; Rec."YVS Approve Status")
             {
                 ApplicationArea = all;
                 ToolTip = 'Specifies the value of the Status field.';
@@ -252,60 +252,63 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
         }
         addfirst(Category_Category8)
         {
-            group("ReleaseReOpen_Promoted")
+
+
+            actionref(Release_promted; Release)
             {
-                Caption = 'Release&ReOpen';
-                ShowAs = SplitButton;
-
-                actionref(Release_promted; Release)
-                {
-                }
-                actionref(Open_promted; Open)
-                {
-                }
-
             }
+            actionref(Open_promted; Open)
+            {
+            }
+
+
         }
         addfirst(Category_Category12)
         {
-            group(ApproveEntries_Promoted)
-            {
-                Caption = 'Approve Entries';
-                actionref(Approve_Entries_Promoted; "Approve Entries") { }
-            }
+
+            actionref(Approve_Entries_Promoted; "Approve Entries") { }
+
         }
         addfirst(Category_Category9)
         {
-            group("Approval_Promoted")
-            {
-                Caption = 'Approval';
-                actionref(Approve_Promoted; "Approve") { }
-                actionref(Reject_Promoted; "Reject") { }
-                actionref(Delegate_Promoted; "Delegate") { }
-                actionref(Comment_Promoted; "Comment") { }
 
-            }
+            actionref(Approve_Promoted; "Approve") { }
+            actionref(Reject_Promoted; "Reject") { }
+            actionref(Delegate_Promoted; "Delegate") { }
+            actionref(Comment_Promoted; "Comment") { }
+
 
         }
         addfirst(Category_Category10)
         {
-            group("Request to Approval_Promoted")
+            Group("Send A&pproval Requst Promoted")
             {
-                Caption = 'Request to Approval';
-                Group("Send A&pproval Requst Promoted")
-                {
-                    Caption = 'Send A&pproval Requst';
-                    actionref(Journal_Batch_Promoted; "Journal Batch") { }
-                    actionref(Journal_Line_Promoted; "Journal by Line") { }
-                }
-                Group("Cancel Approval Request Promoted")
-                {
-                    Caption = 'Cancel Approval Request';
-                    actionref(CancelJournal_Promoted; "CancelJournal Batch") { }
-                    actionref(CancelJournalLine_Promoted; "CancelJournal by Line") { }
-                }
-
+                Caption = 'Send A&pproval Requst';
+                actionref(Journal_Batch_Promoted; "Journal Batch") { }
+                actionref(Journal_Line_Promoted; "Journal by Line") { }
             }
+            Group("Cancel Approval Request Promoted")
+            {
+                Caption = 'Cancel Approval Request';
+                actionref(CancelJournal_Promoted; "CancelJournal Batch") { }
+                actionref(CancelJournalLine_Promoted; "CancelJournal by Line") { }
+            }
+        }
+        modify(Category_Category8)
+        {
+            Caption = 'Release';
+        }
+        modify(Category_Category10)
+        {
+            Caption = 'Request to Approval';
+        }
+        modify(Category_Category9)
+        {
+            Caption = 'Approval';
+        }
+        modify(Category_Category12)
+        {
+            Caption = 'Approve Entries';
         }
 
     }
@@ -332,7 +335,7 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
         gvIsBatch := pIsBatch;
         rec.SetRange("Journal Template Name", gvTemplateName);
         rec.SetRange("Journal Batch Name", gvBatchName);
-        rec.SetRange("YVS Status", rec."YVS Status"::"Pending Approval");
+        rec.SetRange("YVS Approve Status", rec."YVS Approve Status"::"Pending Approval");
     end;
 
     trigger OnAfterGetRecord()

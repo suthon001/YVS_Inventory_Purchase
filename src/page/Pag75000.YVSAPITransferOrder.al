@@ -111,11 +111,10 @@ page 75000 "YVS API Transfer Order"
                 }
 
             }
-            part(transfersubform; "Transfer Order Subform")
+            part(transfersubform; "YVS API Transfer Order Subform")
             {
+                Caption = 'Lines';
                 SubPageLink = "Document No." = field("No."), "Derived From Line No." = const(0);
-                EntityName = 'transferline';
-                EntitySetName = 'transferlines';
                 ApplicationArea = all;
             }
         }

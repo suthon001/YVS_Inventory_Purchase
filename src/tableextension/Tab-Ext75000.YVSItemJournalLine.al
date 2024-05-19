@@ -5,7 +5,7 @@ tableextension 75000 "YVS Item Journal Line" extends "Item Journal Line"
 {
     fields
     {
-        field(75000; "YVS Status"; enum "YVS Item Journal Doc. Status")
+        field(75000; "YVS Approve Status"; enum "YVS Item Journal Doc. Status")
         {
             Caption = 'Status';
             DataClassification = CustomerContent;
@@ -27,7 +27,7 @@ tableextension 75000 "YVS Item Journal Line" extends "Item Journal Line"
     /// </summary>
     procedure TestStatusRelease()
     begin
-        TESTFIELD("YVS Status", "YVS Status"::Open);
+        TESTFIELD("YVS Approve Status", "YVS Approve Status"::Open);
     end;
 
     [IntegrationEvent(false, false)]
@@ -65,7 +65,7 @@ tableextension 75000 "YVS Item Journal Line" extends "Item Journal Line"
     /// </summary>
     procedure CheckbeforReOpen()
     begin
-        if rec."YVS Status" = rec."YVS Status"::"Pending Approval" then
+        if rec."YVS Approve Status" = rec."YVS Approve Status"::"Pending Approval" then
             Error(Text003Msg);
     end;
 
@@ -85,7 +85,7 @@ tableextension 75000 "YVS Item Journal Line" extends "Item Journal Line"
         ItemJournalLine.TestField("Item No.");
         ItemJournalLine.TestField("Location Code");
         ItemJournalLine.TestField(Quantity);
-        ItemJournalLine.TestField("YVS Status", ItemJournalLine."YVS Status"::Open);
+        ItemJournalLine.TestField("YVS Approve Status", ItemJournalLine."YVS Approve Status"::Open);
         if not IsItemItemJournalEnabled(ItemJournalLine) then
             Error(NoWorkflowEnbMsg);
         exit(true);

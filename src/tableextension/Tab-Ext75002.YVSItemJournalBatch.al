@@ -3,15 +3,15 @@
 /// </summary>
 tableextension 75002 "YVS Item Journal Batch" extends "Item Journal Batch"
 {
-    fields
-    {
-        field(75000; "YVS Status"; enum "YVS Item Journal Doc. Status")
-        {
-            Caption = 'Status';
-            DataClassification = CustomerContent;
-            Editable = false;
-        }
-    }
+    // fields
+    // {
+    //     field(75000; "YVS Approve Status"; enum "YVS Item Journal Doc. Status")
+    //     {
+    //         Caption = 'Status';
+    //         DataClassification = CustomerContent;
+    //         Editable = false;
+    //     }
+    // }
     [IntegrationEvent(false, false)]
     PROCEDURE OnSendItemJournalBatchforApproval(var ItemJournalBatch: Record "Item Journal Batch");
     begin
@@ -41,14 +41,6 @@ tableextension 75002 "YVS Item Journal Batch" extends "Item Journal Batch"
             Error(Text002Msg);
     end;
 
-    /// <summary>
-    /// CheckbeforReOpen.
-    /// </summary>
-    procedure CheckbeforReOpen()
-    begin
-        if rec."YVS Status" = rec."YVS Status"::"Pending Approval" then
-            Error(Text003Msg);
-    end;
 
 
 
@@ -65,7 +57,7 @@ tableextension 75002 "YVS Item Journal Batch" extends "Item Journal Batch"
         ItemJournalLine.reset();
         ItemJournalLine.SetRange("Journal Template Name", ItemJournalBatch."Journal Template Name");
         ItemJournalLine.SetRange("Journal Batch Name", ItemJournalBatch.name);
-        ItemJournalLine.SetRange("YVS Status", ItemJournalLine."YVS Status"::Open);
+        ItemJournalLine.SetRange("YVS Approve Status", ItemJournalLine."YVS Approve Status"::Open);
         if ItemJournalLine.FindSet() then
             repeat
                 ItemJournalLine.TestField("Posting Date");
@@ -84,5 +76,4 @@ tableextension 75002 "YVS Item Journal Batch" extends "Item Journal Batch"
 
     var
         Text002Msg: Label 'This document can only be released when the approval process is complete.';
-        Text003Msg: Label 'The approval process must be cancelled or completed to reopen this document.';
 }
