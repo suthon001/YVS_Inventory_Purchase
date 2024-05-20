@@ -17,11 +17,11 @@
             "tenant": "c82c348b-64ef-4a07-bfa7-62fc88bc1517"
         },
         {
-            "name": "HH",
+            "name": "TPPSandbox01",
             "request": "launch",
             "type": "al",
             "environmentType": "Sandbox",
-            "environmentName": "DEV",
+            "environmentName": "TPP_Sandbox001",
             "startupObjectId": 22,
             "startupObjectType": "Page",
             "breakOnError": true,
@@ -29,7 +29,8 @@
             "enableLongRunningSqlStatements": true,
             "schemaUpdateMode": "ForceSync",
             "enableSqlInformationDebugger": true,
-            "tenant": "4ef4cef4-feda-4adf-a799-109703e11237"
-        }
+            "tenant": "a3f39fc8-3df5-4e7c-ae80-4f33b85d1e64"
+        },
+        
     ]
 }
