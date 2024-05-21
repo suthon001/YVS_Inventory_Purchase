@@ -351,6 +351,7 @@ codeunit 75000 "YVS Inven & Purchase Func"
         case RecRef.Number OF
             DATABASE::"Item Journal Line":
                 begin
+
                     RecRef.SetTable(ItemJournalLine);
                     ApprovalEntryArgument."Document Type" := ApprovalEntryArgument."Document Type"::"Item Journal Line";
                     ApprovalEntryArgument."Document No." := ItemJournalLine."Document No.";
@@ -579,9 +580,7 @@ codeunit 75000 "YVS Inven & Purchase Func"
         ItemJournalLine: Record "Item Journal Line";
         workflowSetup: Codeunit "Workflow Setup";
     begin
-        ItemJournalLine.SetRange("Journal Template Name");
-        ItemJournalLine.SetRange("Journal Batch Name");
-        ItemJournalLine.SetRange("Entry Type");
+
         ItemJournalLine.SetRange("YVS Approve Status", Status);
         exit(StrSubstNo(ItemJournalLineConditionTxt, workflowSetup.Encode(ItemJournalLine.GetView(false))));
     end;
@@ -591,8 +590,7 @@ codeunit 75000 "YVS Inven & Purchase Func"
         ItemJournalBatch: Record "Item Journal Batch";
         workflowSetup: Codeunit "Workflow Setup";
     begin
-        ItemJournalBatch.SetRange("Journal Template Name");
-        ItemJournalBatch.SetRange(Name);
+
         exit(StrSubstNo(ItemJournalBatchConditionTxt, workflowSetup.Encode(ItemJournalBatch.GetView(false))));
     end;
 
