@@ -17,6 +17,24 @@ tableextension 75000 "YVS Item Journal Line" extends "Item Journal Line"
             DataClassification = CustomerContent;
             Editable = false;
         }
+        field(75002; "YVS Send By"; Code[50])
+        {
+            Caption = 'Send By';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
+        field(75003; "YVS Send DateTime"; DateTime)
+        {
+            Caption = 'Send DateTime';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
+        field(75004; "YVS Send Transfer"; Boolean)
+        {
+            Caption = 'Send Transfer';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
     }
     trigger OnDelete()
     begin

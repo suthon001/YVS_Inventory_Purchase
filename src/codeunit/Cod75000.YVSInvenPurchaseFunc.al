@@ -5,11 +5,93 @@ codeunit 75000 "YVS Inven & Purchase Func"
 {
 
     /// <summary>
+    /// CreateJsonItemJournal.
+    /// </summary>
+    /// <param name="pItemJournal">VAR Record "Item Journal Line".</param>
+    procedure CreateJsonItemJournal(var pItemJournal: Record "Item Journal Line")
+    var
+        PageControlField: Record "Page Control Field";
+        ltReservetionEntry: Record "Reservation Entry";
+        ltField: Record Field;
+        ltRecordRef: RecordRef;
+        ltFieldRef: FieldRef;
+        JsonArray, JsonArrayLineTrackingALL : JsonArray;
+        JsonObjectHeader, JsonObject, JsonObjectTracking, JsonObjectAddALL : JsonObject;
+        JsonResult: Text;
+        ltInteger: Integer;
+        ltDecimal: Decimal;
+    begin
+        if pItemJournal.FindSet() then
+            repeat
+                CLEAR(JsonObjectHeader);
+                PageControlField.Reset();
+                PageControlField.SetCurrentKey(PageNo, FieldNo);
+                PageControlField.SetRange(TableNo, Database::"Item Journal Line");
+                PageControlField.SetRange(PageNo, Page::"Item Journal");
+                PageControlField.SetRange(Visible, 'true');
+                if PageControlField.FindSet() then begin
+                    JsonObjectHeader.Add('Journal Template Name', pItemJournal."Journal Template Name");
+                    JsonObjectHeader.Add('Journal Batch Name', pItemJournal."Journal Batch Name");
+                    JsonObjectHeader.Add('Line No.', pItemJournal."Line No.");
+                    repeat
+                        if ltField.GET(PageControlField.TableNo, PageControlField.FieldNo) then
+                            if not ltField.IsPartOfPrimaryKey then begin
+                                ltFieldRef := ltRecordRef.Field(ltField."No.");
+                                if ltField.Class = ltField.Class::FlowField then
+                                    ltFieldRef.CalcField();
+                                if ltField.Type in [ltField.Type::Decimal, ltField.Type::Integer] then begin
+                                    if ltField.Type = ltField.Type::Integer then begin
+                                        Evaluate(ltInteger, format(ltFieldRef.Value));
+                                        JsonObjectHeader.Add(ltField."Field Caption", ltInteger);
+                                    end;
+                                    if ltField.Type = ltField.Type::decimal then begin
+                                        Evaluate(ltDecimal, format(ltFieldRef.Value));
+                                        JsonObjectHeader.Add(ltField."Field Caption", ltDecimal);
+                                    end;
+                                end else
+                                    if ltField.Type = ltField.Type::Date then
+                                        JsonObjectHeader.Add(ltField."Field Caption", format(ltFieldRef.Value, 0, '<year4>/<Month,2>/<Day,2>'))
+                                    else
+                                        JsonObjectHeader.Add(ltField."Field Caption", format(ltFieldRef.Value));
+                            end;
+                    until PageControlField.next() = 0;
+                end;
+                CLEAR(JsonObjectTracking);
+                CLEAR(JsonArrayLineTrackingALL);
+                ltReservetionEntry.reset();
+                ltReservetionEntry.SetCurrentKey("Entry No.");
+                ltReservetionEntry.SetRange("Source ID", pItemJournal."Journal Template Name");
+                ltReservetionEntry.SetRange("Source Batch Name", pItemJournal."Journal Batch Name");
+                ltReservetionEntry.SetRange("Source Ref. No.", pItemJournal."Line No.");
+                if ltReservetionEntry.FindSet() then begin
+                    repeat
+                        CLEAR(JsonObjectTracking);
+                        JsonObjectTracking.Add('Lot No.', ltReservetionEntry."Lot No.");
+                        JsonObjectTracking.Add('Serial No.', ltReservetionEntry."Serial No.");
+                        JsonObjectTracking.Add('Quantity', ltReservetionEntry.Quantity);
+                        JsonObjectTracking.Add('Expiration Date', ltReservetionEntry."Expiration Date");
+                        JsonObjectTracking.Add('Warranty Date', ltReservetionEntry."Warranty Date");
+                        JsonArrayLineTrackingALL.Add(JsonObject);
+                    until ltReservetionEntry.Next() = 0;
+                    JsonObjectHeader.Add('reservetion', JsonArrayLineTrackingALL);
+                end;
+                JsonArray.Add(JsonObjectHeader);
+                pItemJournal."YVS Send By" := COPYSTR(UserId(), 1, MaxStrLen(pItemJournal."YVS Send By"));
+                pItemJournal."YVS Send DateTime" := CurrentDateTime();
+                pItemJournal."YVS Send Transfer" := true;
+                pItemJournal.Modify();
+            until pItemJournal.Next() = 0;
+        JsonObjectAddALL.Add('itemjournals', JsonArray);
+        JsonObjectAddALL.WriteTo(JsonResult);
+        Message(JsonResult);
+    end;
+
+    /// <summary>
     /// CreateJsonTransferOrder.
     /// </summary>
     /// <param name="pTransferOrder">VAR Record "Transfer Header".</param>
-    /// <returns>Return value of type Text.</returns>
-    procedure CreateJsonTransferOrder(var pTransferOrder: Record "Transfer Header"): Text;
+    procedure CreateJsonTransferOrder(var
+                                          pTransferOrder: Record "Transfer Header")
     var
         TransferLines: Record "Transfer Line";
         PageControlField: Record "Page Control Field";
@@ -121,6 +203,10 @@ codeunit 75000 "YVS Inven & Purchase Func"
                 CLEAR(JsonObject);
                 JsonObjectHeader.Add('lines', JsonArrayLine);
                 JsonArray.Add(JsonObjectHeader);
+                pTransferOrder."YVS Send By" := COPYSTR(UserId(), 1, MaxStrLen(pTransferOrder."YVS Send By"));
+                pTransferOrder."YVS Send DateTime" := CurrentDateTime();
+                pTransferOrder."YVS Send Transfer" := true;
+                pTransferOrder.Modify();
             until pTransferOrder.Next() = 0;
         JsonObjectAddALL.Add('transferorders', JsonArray);
         JsonObjectAddALL.WriteTo(JsonResult);
