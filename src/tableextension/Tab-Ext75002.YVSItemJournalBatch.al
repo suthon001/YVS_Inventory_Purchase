@@ -3,15 +3,7 @@
 /// </summary>
 tableextension 75002 "YVS Item Journal Batch" extends "Item Journal Batch"
 {
-    // fields
-    // {
-    //     field(75000; "YVS Approve Status"; enum "YVS Item Journal Doc. Status")
-    //     {
-    //         Caption = 'Status';
-    //         DataClassification = CustomerContent;
-    //         Editable = false;
-    //     }
-    // }
+
     [IntegrationEvent(false, false)]
     PROCEDURE OnSendItemJournalBatchforApproval(var ItemJournalBatch: Record "Item Journal Batch");
     begin

@@ -4,6 +4,165 @@
 codeunit 75000 "YVS Inven & Purchase Func"
 {
 
+    /// <summary>
+    /// CreateJsonTransferOrder.
+    /// </summary>
+    /// <param name="pTransferOrder">VAR Record "Transfer Header".</param>
+    /// <returns>Return value of type Text.</returns>
+    procedure CreateJsonTransferOrder(var pTransferOrder: Record "Transfer Header"): Text;
+    var
+        TransferLines: Record "Transfer Line";
+        PageControlField: Record "Page Control Field";
+        ltReservetionEntry: Record "Reservation Entry";
+        ltField: Record Field;
+        ltRecordRef: RecordRef;
+        ltFieldRef: FieldRef;
+        JsonArray, JsonArrayLine, JsonArrayLineTrackingALL : JsonArray;
+        JsonObjectHeader, JsonObject, JsonObjectLine, JsonObjectTracking, JsonObjectAddALL : JsonObject;
+        JsonResult: Text;
+        ltInteger: Integer;
+        ltDecimal: Decimal;
+    begin
+        if pTransferOrder.FindSet() then
+            repeat
+                CLEAR(JsonObjectHeader);
+                ltRecordRef.Get(pTransferOrder.RecordId);
+                PageControlField.Reset();
+                PageControlField.SetCurrentKey(PageNo, FieldNo);
+                PageControlField.SetRange(TableNo, Database::"Transfer Header");
+                PageControlField.SetRange(PageNo, Page::"Transfer Order");
+                PageControlField.SetRange(Visible, 'true');
+                if PageControlField.FindSet() then begin
+                    JsonObjectHeader.Add('Document No.', pTransferOrder."No.");
+                    repeat
+                        if ltField.GET(PageControlField.TableNo, PageControlField.FieldNo) then
+                            if not ltField.IsPartOfPrimaryKey then begin
+                                ltFieldRef := ltRecordRef.Field(ltField."No.");
+                                if ltField.Class = ltField.Class::FlowField then
+                                    ltFieldRef.CalcField();
+                                if ltField.Type in [ltField.Type::Decimal, ltField.Type::Integer] then begin
+                                    if ltField.Type = ltField.Type::Integer then begin
+                                        Evaluate(ltInteger, format(ltFieldRef.Value));
+                                        JsonObjectHeader.Add(ltField."Field Caption", ltInteger);
+                                    end;
+                                    if ltField.Type = ltField.Type::decimal then begin
+                                        Evaluate(ltDecimal, format(ltFieldRef.Value));
+                                        JsonObjectHeader.Add(ltField."Field Caption", ltDecimal);
+                                    end;
+                                end else
+                                    if ltField.Type = ltField.Type::Date then
+                                        JsonObjectHeader.Add(ltField."Field Caption", format(ltFieldRef.Value, 0, '<year4>/<Month,2>/<Day,2>'))
+                                    else
+                                        JsonObjectHeader.Add(ltField."Field Caption", format(ltFieldRef.Value));
+                            end;
+                    until PageControlField.Next() = 0;
+                end;
+                CLEAR(JsonArrayLine);
+                TransferLines.reset();
+                TransferLines.SetRange("Document No.", pTransferOrder."No.");
+                TransferLines.SetRange("Derived From Line No.", 0);
+                TransferLines.SetFilter("Item No.", '<>%1', '');
+                if TransferLines.FindSet() then
+                    repeat
+                        CLEAR(JsonObjectLine);
+                        ltRecordRef.Get(TransferLines.RecordId);
+                        PageControlField.Reset();
+                        PageControlField.SetCurrentKey(PageNo, FieldNo);
+                        PageControlField.SetRange(TableNo, Database::"Transfer Line");
+                        PageControlField.SetRange(PageNo, Page::"Transfer Order Subform");
+                        PageControlField.SetRange(Visible, 'true');
+                        if PageControlField.FindSet() then begin
+                            JsonObjectLine.Add('Line No.', TransferLines."Line No.");
+                            repeat
+                                if ltField.GET(PageControlField.TableNo, PageControlField.FieldNo) then
+                                    if not ltField.IsPartOfPrimaryKey then begin
+                                        ltFieldRef := ltRecordRef.Field(ltField."No.");
+                                        if ltField.Class = ltField.Class::FlowField then
+                                            ltFieldRef.CalcField();
+                                        if ltField.Type in [ltField.Type::Decimal, ltField.Type::Integer] then begin
+                                            if ltField.Type = ltField.Type::Integer then begin
+                                                Evaluate(ltInteger, format(ltFieldRef.Value));
+                                                JsonObjectLine.Add(ltField."Field Caption", ltInteger);
+                                            end;
+                                            if ltField.Type = ltField.Type::decimal then begin
+                                                Evaluate(ltDecimal, format(ltFieldRef.Value));
+                                                JsonObjectLine.Add(ltField."Field Caption", ltDecimal);
+                                            end;
+                                        end else
+                                            if ltField.Type = ltField.Type::Date then
+                                                JsonObjectLine.Add(ltField."Field Caption", format(ltFieldRef.Value, 0, '<year4>/<Month,2>/<Day,2>'))
+                                            else
+                                                JsonObjectLine.Add(ltField."Field Caption", format(ltFieldRef.Value));
+                                    end;
+
+                            until PageControlField.Next() = 0;
+                        end;
+                        CLEAR(JsonObjectTracking);
+                        CLEAR(JsonArrayLineTrackingALL);
+                        ltReservetionEntry.reset();
+                        ltReservetionEntry.SetCurrentKey("Entry No.");
+                        ltReservetionEntry.SetRange("Source ID", TransferLines."Document No.");
+                        ltReservetionEntry.SetRange("Source Ref. No.", TransferLines."Line No.");
+                        ltReservetionEntry.SetRange(Positive, false);
+                        if ltReservetionEntry.FindSet() then begin
+                            repeat
+                                CLEAR(JsonObjectTracking);
+                                JsonObjectTracking.Add('Lot No.', ltReservetionEntry."Lot No.");
+                                JsonObjectTracking.Add('Serial No.', ltReservetionEntry."Serial No.");
+                                JsonObjectTracking.Add('Quantity', ltReservetionEntry.Quantity);
+                                JsonObjectTracking.Add('Expiration Date', ltReservetionEntry."Expiration Date");
+                                JsonObjectTracking.Add('Warranty Date', ltReservetionEntry."Warranty Date");
+                                JsonArrayLineTrackingALL.Add(JsonObject);
+                            until ltReservetionEntry.Next() = 0;
+                            JsonObjectLine.Add('reservetion', JsonArrayLineTrackingALL);
+                        end;
+                    until TransferLines.Next() = 0;
+                JsonArrayLine.Add(JsonObjectLine);
+                CLEAR(JsonObject);
+                JsonObjectHeader.Add('lines', JsonArrayLine);
+                JsonArray.Add(JsonObjectHeader);
+            until pTransferOrder.Next() = 0;
+        JsonObjectAddALL.Add('transferorders', JsonArray);
+        JsonObjectAddALL.WriteTo(JsonResult);
+        Message(JsonResult);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Purchase Line", 'OnBeforeUpdateDirectUnitCost', '', false, false)]
+    local procedure OnBeforeUpdateDirectUnitCost(CalledByFieldNo: Integer; var Handled: Boolean; var PurchLine: Record "Purchase Line")
+    begin
+        if PurchLine."Document Type" = PurchLine."Document Type"::Order then
+            if not CheckPermissionItemInVisible() then
+                Handled := true;
+    end;
+    /// <summary>
+    /// CheckPermissionCostInVisible.
+    /// </summary>
+    /// <returns>Return value of type Boolean.</returns>
+    procedure CheckPermissionCostInVisible(): Boolean
+    var
+        PermissionMgt: Codeunit "User Permissions";
+        ZeroGUID: Guid;
+    begin
+        if PermissionMgt.HasUserPermissionSetAssigned(UserSecurityId(), CompanyName, 'COSTINVISIBLE', 1, ZeroGUID) then
+            exit(false);
+        exit(true);
+    end;
+
+    /// <summary>
+    /// CheckPermissionItemInVisible.
+    /// </summary>
+    /// <returns>Return value of type Boolean.</returns>
+    procedure CheckPermissionItemInVisible(): Boolean
+    var
+        PermissionMgt: Codeunit "User Permissions";
+        ZeroGUID: Guid;
+    begin
+        if PermissionMgt.HasUserPermissionSetAssigned(UserSecurityId(), CompanyName, 'ITEMINVISIBLE', 1, ZeroGUID) then
+            exit(false);
+        exit(true);
+    end;
+
+
     [EventSubscriber(ObjectType::table, database::"Approval Entry", 'OnBeforeShowRecord', '', false, false)]
     local procedure OnBeforeShowRecord(var ApprovalEntry: Record "Approval Entry"; var IsHandled: Boolean)
     var
@@ -351,7 +510,6 @@ codeunit 75000 "YVS Inven & Purchase Func"
         case RecRef.Number OF
             DATABASE::"Item Journal Line":
                 begin
-
                     RecRef.SetTable(ItemJournalLine);
                     ApprovalEntryArgument."Document Type" := ApprovalEntryArgument."Document Type"::"Item Journal Line";
                     ApprovalEntryArgument."Document No." := ItemJournalLine."Document No.";
@@ -580,7 +738,9 @@ codeunit 75000 "YVS Inven & Purchase Func"
         ItemJournalLine: Record "Item Journal Line";
         workflowSetup: Codeunit "Workflow Setup";
     begin
-
+        ItemJournalLine.SetRange("Journal Template Name");
+        ItemJournalLine.SetRange("Journal Batch Name");
+        ItemJournalLine.SetRange("Entry Type");
         ItemJournalLine.SetRange("YVS Approve Status", Status);
         exit(StrSubstNo(ItemJournalLineConditionTxt, workflowSetup.Encode(ItemJournalLine.GetView(false))));
     end;
@@ -590,7 +750,8 @@ codeunit 75000 "YVS Inven & Purchase Func"
         ItemJournalBatch: Record "Item Journal Batch";
         workflowSetup: Codeunit "Workflow Setup";
     begin
-
+        ItemJournalBatch.SetRange("Journal Template Name");
+        ItemJournalBatch.SetRange(Name);
         exit(StrSubstNo(ItemJournalBatchConditionTxt, workflowSetup.Encode(ItemJournalBatch.GetView(false))));
     end;
 

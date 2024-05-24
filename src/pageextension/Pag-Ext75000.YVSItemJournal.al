@@ -5,6 +5,26 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
 {
     layout
     {
+        modify("Unit Amount")
+        {
+            Visible = IsHideValue;
+            HideValue = NOT IsHideValue;
+        }
+        modify(Amount)
+        {
+            Visible = IsHideValue;
+            HideValue = NOT IsHideValue;
+        }
+        modify("Discount Amount")
+        {
+            Visible = IsHideValue;
+            HideValue = NOT IsHideValue;
+        }
+        modify("Unit Cost")
+        {
+            Visible = IsHideValue;
+            HideValue = NOT IsHideValue;
+        }
         addfirst(Control1)
         {
             field("YVS Approve Status"; Rec."YVS Approve Status")
@@ -317,6 +337,8 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
         if not gvIsBatch then
             if gvDocument <> '' then
                 rec.SetRange("Line No.", gvLineNo);
+
+        IsHideValue := InvenPurchFunc.CheckPermissionItemInVisible();
     end;
     /// <summary>
     /// SetDocumnet.
@@ -337,6 +359,7 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
         rec.SetRange("Journal Batch Name", gvBatchName);
         rec.SetRange("YVS Approve Status", rec."YVS Approve Status"::"Pending Approval");
     end;
+
 
     trigger OnAfterGetRecord()
     var
@@ -379,12 +402,15 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
 
 
     var
-        OpenApprovalEntriesExistForCurrUser, CancancelApprovalForrecord, OpenApprovalEntriesExist, CanRequstApprovelForFlow : Boolean;
-        OpenApprovalEntriesExistForCurrUserBatch, CancancelApprovalForrecordBatch, OpenApprovalEntriesExistBatch, CanRequstApprovelForFlowBatch : Boolean;
+
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         workflowWebhoolMgt: Codeunit "Workflow Webhook Management";
+        InvenPurchFunc: Codeunit "YVS Inven & Purchase Func";
+        OpenApprovalEntriesExistForCurrUser, CancancelApprovalForrecord, OpenApprovalEntriesExist, CanRequstApprovelForFlow : Boolean;
+        OpenApprovalEntriesExistForCurrUserBatch, CancancelApprovalForrecordBatch, OpenApprovalEntriesExistBatch, CanRequstApprovelForFlowBatch : Boolean;
         gvDocument: code[20];
         gvBatchName, gvTemplateName : code[10];
         gvLineNo: Integer;
         gvIsBatch: Boolean;
+        IsHideValue: Boolean;
 }
