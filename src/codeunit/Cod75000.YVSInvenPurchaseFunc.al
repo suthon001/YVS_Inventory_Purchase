@@ -24,6 +24,7 @@ codeunit 75000 "YVS Inven & Purchase Func"
         if pItemJournal.FindSet() then
             repeat
                 CLEAR(JsonObjectHeader);
+                ltRecordRef.Get(pItemJournal.RecordId);
                 PageControlField.Reset();
                 PageControlField.SetCurrentKey(PageNo, FieldNo);
                 PageControlField.SetRange(TableNo, Database::"Item Journal Line");
