@@ -29,9 +29,9 @@ tableextension 75000 "YVS Item Journal Line" extends "Item Journal Line"
             DataClassification = CustomerContent;
             Editable = false;
         }
-        field(75004; "YVS Send Transfer"; Boolean)
+        field(75004; "YVS Send API"; Boolean)
         {
-            Caption = 'Send Transfer';
+            Caption = 'Send API';
             DataClassification = CustomerContent;
             Editable = false;
         }

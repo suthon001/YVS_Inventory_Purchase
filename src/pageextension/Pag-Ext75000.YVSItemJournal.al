@@ -33,11 +33,47 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
                 ToolTip = 'Specifies the value of the Status field.';
             }
         }
+        addlast(Control1)
+        {
+            field("YVS Send API"; Rec."YVS Send API")
+            {
+                ApplicationArea = all;
+                ToolTip = 'Specifies the value of the Send API field.';
+            }
+            field("YVS Send By"; Rec."YVS Send By")
+            {
+                ApplicationArea = all;
+                ToolTip = 'Specifies the value of the Send By field.';
+            }
+            field("YVS Send DateTime"; Rec."YVS Send DateTime")
+            {
+                ApplicationArea = all;
+                ToolTip = 'Specifies the value of the Send DateTime field.';
+            }
+        }
     }
     actions
     {
+
+
         addfirst(processing)
         {
+            action(TESTJson)
+            {
+                Image = SendConfirmation;
+                ApplicationArea = all;
+                ToolTip = 'Executes the TEST Json action.';
+                Caption = 'Send API';
+                trigger OnAction()
+                var
+                    ItemJournalLine: Record "Item Journal Line";
+                    InvenPurchFunc: Codeunit "YVS Inven & Purchase Func";
+                begin
+                    ItemJournalLine.Copy(rec);
+                    CurrPage.SetSelectionFilter(ItemJournalLine);
+                    InvenPurchFunc.CreateJsonItemJournal(ItemJournalLine);
+                end;
+            }
             group("ReleaseReOpen")
             {
                 Caption = 'Release&ReOpen';
@@ -313,6 +349,14 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
                 actionref(CancelJournal_Promoted; "CancelJournal Batch") { }
                 actionref(CancelJournalLine_Promoted; "CancelJournal by Line") { }
             }
+        }
+        modify(Category_Category13)
+        {
+            Caption = 'API';
+        }
+        addfirst(Category_Category13)
+        {
+            actionref(TESTJson_Promoted; "TESTJson") { }
         }
         modify(Category_Category8)
         {

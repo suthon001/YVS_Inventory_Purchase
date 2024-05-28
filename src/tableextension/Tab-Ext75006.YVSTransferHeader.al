@@ -17,9 +17,9 @@ tableextension 75006 "YVS Transfer Header" extends "Transfer Header"
             DataClassification = CustomerContent;
             Editable = false;
         }
-        field(75002; "YVS Send Transfer"; Boolean)
+        field(75002; "YVS Send API"; Boolean)
         {
-            Caption = 'Send Transfer';
+            Caption = 'Send API';
             DataClassification = CustomerContent;
             Editable = false;
         }

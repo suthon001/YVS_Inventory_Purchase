@@ -78,7 +78,7 @@ codeunit 75000 "YVS Inven & Purchase Func"
                 JsonArray.Add(JsonObjectHeader);
                 pItemJournal."YVS Send By" := COPYSTR(UserId(), 1, MaxStrLen(pItemJournal."YVS Send By"));
                 pItemJournal."YVS Send DateTime" := CurrentDateTime();
-                pItemJournal."YVS Send Transfer" := true;
+                pItemJournal."YVS Send API" := true;
                 pItemJournal.Modify();
             until pItemJournal.Next() = 0;
         JsonObjectAddALL.Add('itemjournals', JsonArray);
@@ -205,7 +205,7 @@ codeunit 75000 "YVS Inven & Purchase Func"
                 JsonArray.Add(JsonObjectHeader);
                 pTransferOrder."YVS Send By" := COPYSTR(UserId(), 1, MaxStrLen(pTransferOrder."YVS Send By"));
                 pTransferOrder."YVS Send DateTime" := CurrentDateTime();
-                pTransferOrder."YVS Send Transfer" := true;
+                pTransferOrder."YVS Send API" := true;
                 pTransferOrder.Modify();
             until pTransferOrder.Next() = 0;
         JsonObjectAddALL.Add('transferorders', JsonArray);
