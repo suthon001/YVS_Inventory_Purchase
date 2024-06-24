@@ -87,12 +87,12 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
                     var
                         ReleaseBillDoc: Codeunit "YVS Inven & Purchase Func";
                     begin
-                        ReleaseBillDoc.RereleaseBilling(Rec);
+                        ReleaseBillDoc.RereleaseItemJoural(Rec);
                     end;
                 }
                 action("Open")
                 {
-                    Caption = 'Open';
+                    Caption = 'ReOpen';
                     Image = ReOpen;
                     ApplicationArea = all;
                     ToolTip = 'Executes the Open action.';
@@ -101,7 +101,7 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
                         ReleaseBillDoc: Codeunit "YVS Inven & Purchase Func";
                     begin
 
-                        ReleaseBillDoc.ReopenBilling(Rec);
+                        ReleaseBillDoc.ReopenItemJournal(Rec);
                     end;
                 }
                 group(ApproveEntries)
@@ -383,6 +383,11 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
                 rec.SetRange("Line No.", gvLineNo);
 
         IsHideValue := InvenPurchFunc.CheckPermissionItemInVisible();
+    end;
+
+    trigger OnModifyRecord(): Boolean
+    begin
+        rec.TestField("YVS Approve Status", rec."YVS Approve Status"::Open);
     end;
     /// <summary>
     /// SetDocumnet.

@@ -3,6 +3,22 @@
 /// </summary>
 codeunit 75000 "YVS Inven & Purchase Func"
 {
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Batch", 'OnBeforeCode', '', false, false)]
+    local procedure OnBeforeCodeITemJournal(var ItemJournalLine: Record "Item Journal Line")
+    var
+        ItemJnlLine: Record "Item Journal Line";
+        Text002Msg: Label 'This document can only be released when the approval process is complete.';
+    begin
+        ItemJnlLine.LockTable();
+        ItemJnlLine.SetRange("Journal Template Name", ItemJournalLine."Journal Template Name");
+        ItemJnlLine.SetRange("Journal Batch Name", ItemJournalLine."Journal Batch Name");
+        if ItemJnlLine.FindSet() then
+            repeat
+                if ItemJnlLine.IsItemItemJournalEnabled(ItemJnlLine) then
+                    if ItemJnlLine."YVS Approve Status" <> ItemJnlLine."YVS Approve Status"::Released then
+                        ERROR(Text002Msg);
+            until ItemJnlLine.Next() = 0;
+    end;
 
     /// <summary>
     /// CreateJsonItemJournal.
@@ -91,8 +107,7 @@ codeunit 75000 "YVS Inven & Purchase Func"
     /// CreateJsonTransferOrder.
     /// </summary>
     /// <param name="pTransferOrder">VAR Record "Transfer Header".</param>
-    procedure CreateJsonTransferOrder(var
-                                          pTransferOrder: Record "Transfer Header")
+    procedure CreateJsonTransferOrder(var pTransferOrder: Record "Transfer Header")
     var
         TransferLines: Record "Transfer Line";
         PageControlField: Record "Page Control Field";
@@ -108,97 +123,21 @@ codeunit 75000 "YVS Inven & Purchase Func"
     begin
         if pTransferOrder.FindSet() then
             repeat
-                CLEAR(JsonObjectHeader);
-                ltRecordRef.Get(pTransferOrder.RecordId);
-                PageControlField.Reset();
-                PageControlField.SetCurrentKey(PageNo, FieldNo);
-                PageControlField.SetRange(TableNo, Database::"Transfer Header");
-                PageControlField.SetRange(PageNo, Page::"Transfer Order");
-                PageControlField.SetRange(Visible, 'true');
-                if PageControlField.FindSet() then begin
-                    JsonObjectHeader.Add('Document No.', pTransferOrder."No.");
-                    repeat
-                        if ltField.GET(PageControlField.TableNo, PageControlField.FieldNo) then
-                            if not ltField.IsPartOfPrimaryKey then begin
-                                ltFieldRef := ltRecordRef.Field(ltField."No.");
-                                if ltField.Class = ltField.Class::FlowField then
-                                    ltFieldRef.CalcField();
-                                if ltField.Type in [ltField.Type::Decimal, ltField.Type::Integer] then begin
-                                    if ltField.Type = ltField.Type::Integer then begin
-                                        Evaluate(ltInteger, format(ltFieldRef.Value));
-                                        JsonObjectHeader.Add(ltField."Field Caption", ltInteger);
-                                    end;
-                                    if ltField.Type = ltField.Type::decimal then begin
-                                        Evaluate(ltDecimal, format(ltFieldRef.Value));
-                                        JsonObjectHeader.Add(ltField."Field Caption", ltDecimal);
-                                    end;
-                                end else
-                                    if ltField.Type = ltField.Type::Date then
-                                        JsonObjectHeader.Add(ltField."Field Caption", format(ltFieldRef.Value, 0, '<year4>/<Month,2>/<Day,2>'))
-                                    else
-                                        JsonObjectHeader.Add(ltField."Field Caption", format(ltFieldRef.Value));
-                            end;
-                    until PageControlField.Next() = 0;
-                end;
-                CLEAR(JsonArrayLine);
+                JsonObjectHeader.Add('No', pTransferOrder."No.");
+                JsonObjectHeader.Add('Transfer_from_Code', pTransferOrder."Transfer-from Code");
+                JsonObjectHeader.Add('Transfer_to_Code', pTransferOrder."Transfer-to Code");
+                JsonObjectHeader.Add('Retailer_No', pTransferOrder."Transfer-to Code");
+                JsonObjectHeader.Add('Store_Location', pTransferOrder."Transfer-to Code");
+                JsonObjectHeader.Add('Store_Contact', pTransferOrder."Transfer-to Code");
+                JsonObjectHeader.Add('Order_No', pTransferOrder."Transfer-to Code");
+                JsonObjectHeader.Add('Document_Date', format(pTransferOrder."Posting Date", 0, '<Day,2>/<Month,2>/<year4>'));
                 TransferLines.reset();
                 TransferLines.SetRange("Document No.", pTransferOrder."No.");
                 TransferLines.SetRange("Derived From Line No.", 0);
                 TransferLines.SetFilter("Item No.", '<>%1', '');
                 if TransferLines.FindSet() then
                     repeat
-                        CLEAR(JsonObjectLine);
-                        ltRecordRef.Get(TransferLines.RecordId);
-                        PageControlField.Reset();
-                        PageControlField.SetCurrentKey(PageNo, FieldNo);
-                        PageControlField.SetRange(TableNo, Database::"Transfer Line");
-                        PageControlField.SetRange(PageNo, Page::"Transfer Order Subform");
-                        PageControlField.SetRange(Visible, 'true');
-                        if PageControlField.FindSet() then begin
-                            JsonObjectLine.Add('Line No.', TransferLines."Line No.");
-                            repeat
-                                if ltField.GET(PageControlField.TableNo, PageControlField.FieldNo) then
-                                    if not ltField.IsPartOfPrimaryKey then begin
-                                        ltFieldRef := ltRecordRef.Field(ltField."No.");
-                                        if ltField.Class = ltField.Class::FlowField then
-                                            ltFieldRef.CalcField();
-                                        if ltField.Type in [ltField.Type::Decimal, ltField.Type::Integer] then begin
-                                            if ltField.Type = ltField.Type::Integer then begin
-                                                Evaluate(ltInteger, format(ltFieldRef.Value));
-                                                JsonObjectLine.Add(ltField."Field Caption", ltInteger);
-                                            end;
-                                            if ltField.Type = ltField.Type::decimal then begin
-                                                Evaluate(ltDecimal, format(ltFieldRef.Value));
-                                                JsonObjectLine.Add(ltField."Field Caption", ltDecimal);
-                                            end;
-                                        end else
-                                            if ltField.Type = ltField.Type::Date then
-                                                JsonObjectLine.Add(ltField."Field Caption", format(ltFieldRef.Value, 0, '<year4>/<Month,2>/<Day,2>'))
-                                            else
-                                                JsonObjectLine.Add(ltField."Field Caption", format(ltFieldRef.Value));
-                                    end;
 
-                            until PageControlField.Next() = 0;
-                        end;
-                        CLEAR(JsonObjectTracking);
-                        CLEAR(JsonArrayLineTrackingALL);
-                        ltReservetionEntry.reset();
-                        ltReservetionEntry.SetCurrentKey("Entry No.");
-                        ltReservetionEntry.SetRange("Source ID", TransferLines."Document No.");
-                        ltReservetionEntry.SetRange("Source Ref. No.", TransferLines."Line No.");
-                        ltReservetionEntry.SetRange(Positive, false);
-                        if ltReservetionEntry.FindSet() then begin
-                            repeat
-                                CLEAR(JsonObjectTracking);
-                                JsonObjectTracking.Add('Lot No.', ltReservetionEntry."Lot No.");
-                                JsonObjectTracking.Add('Serial No.', ltReservetionEntry."Serial No.");
-                                JsonObjectTracking.Add('Quantity', ltReservetionEntry.Quantity);
-                                JsonObjectTracking.Add('Expiration Date', ltReservetionEntry."Expiration Date");
-                                JsonObjectTracking.Add('Warranty Date', ltReservetionEntry."Warranty Date");
-                                JsonArrayLineTrackingALL.Add(JsonObject);
-                            until ltReservetionEntry.Next() = 0;
-                            JsonObjectLine.Add('reservetion', JsonArrayLineTrackingALL);
-                        end;
                     until TransferLines.Next() = 0;
                 JsonArrayLine.Add(JsonObjectLine);
                 CLEAR(JsonObject);
@@ -274,10 +213,10 @@ codeunit 75000 "YVS Inven & Purchase Func"
 
 
     /// <summary>
-    /// RereleaseBilling.
+    /// RereleaseItemJoural.
     /// </summary>
     /// <param name="ItemJournalLine">Record "Item Journal Line".</param>
-    procedure RereleaseBilling(var ItemJournalLine: Record "Item Journal Line")
+    procedure RereleaseItemJoural(var ItemJournalLine: Record "Item Journal Line")
     var
         JournalBatch: record "Item Journal Batch";
     begin
@@ -305,7 +244,7 @@ codeunit 75000 "YVS Inven & Purchase Func"
     /// ReopenBilling.
     /// </summary>
     /// <param name="ItemJournalLine">VAR Record "Item Journal Line".</param>
-    procedure "ReopenBilling"(var ItemJournalLine: Record "Item Journal Line")
+    procedure "ReopenItemJournal"(var ItemJournalLine: Record "Item Journal Line")
     begin
         IF ItemJournalLine."YVS Approve Status" in [ItemJournalLine."YVS Approve Status"::Open] THEN
             EXIT;

@@ -36,6 +36,7 @@ tableextension 75000 "YVS Item Journal Line" extends "Item Journal Line"
             Editable = false;
         }
     }
+
     trigger OnDelete()
     begin
         TestStatusRelease();
@@ -59,7 +60,12 @@ tableextension 75000 "YVS Item Journal Line" extends "Item Journal Line"
     end;
 
 
-    local procedure IsItemItemJournalEnabled(var ItemJournalLine: Record "Item Journal Line"): Boolean
+    /// <summary>
+    /// IsItemItemJournalEnabled.
+    /// </summary>
+    /// <param name="ItemJournalLine">VAR Record "Item Journal Line".</param>
+    /// <returns>Return value of type Boolean.</returns>
+    procedure IsItemItemJournalEnabled(var ItemJournalLine: Record "Item Journal Line"): Boolean
     var
         WFMngt: Codeunit "Workflow Management";
         WFCode: Codeunit "YVS Inven & Purchase Func";
