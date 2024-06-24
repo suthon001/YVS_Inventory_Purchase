@@ -17,6 +17,7 @@ codeunit 75000 "YVS Inven & Purchase Func"
                 if ItemJnlLine.IsItemItemJournalEnabled(ItemJnlLine) then
                     if ItemJnlLine."YVS Approve Status" <> ItemJnlLine."YVS Approve Status"::Released then
                         ERROR(Text002Msg);
+
             until ItemJnlLine.Next() = 0;
     end;
 
