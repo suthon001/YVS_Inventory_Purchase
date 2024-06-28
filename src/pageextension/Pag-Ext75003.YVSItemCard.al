@@ -1,7 +1,7 @@
 /// <summary>
 /// PageExtension YVS Item Card (ID 75003) extends Record Item Card.
 /// </summary>
-pageextension 75003 "YVS Item Card" extends "Item Card"
+pageextension 75003 "YVS Item Card2" extends "Item Card"
 {
     layout
     {

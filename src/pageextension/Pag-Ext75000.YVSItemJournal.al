@@ -1,7 +1,7 @@
 /// <summary>
 /// PageExtension YVS Item Journal (ID 75000) extends Record Item Journal.
 /// </summary>
-pageextension 75000 "YVS Item Journal" extends "Item Journal"
+pageextension 75000 "YVS Item Journal2" extends "Item Journal"
 {
     layout
     {
@@ -55,6 +55,28 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
     actions
     {
 
+        addafter("&Print")
+        {
+            action("InventoryMovementPrint")
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = '&Print';
+                Ellipsis = true;
+                Image = Print;
+                ToolTip = 'Prepare to print the document. A report request window for the document opens where you can specify what to include on the print-out.';
+
+                trigger OnAction()
+                var
+                    ItemJnlLine: Record "Item Journal Line";
+                begin
+                    ItemJnlLine.Copy(Rec);
+                    ItemJnlLine.SetRange("Journal Template Name", rec."Journal Template Name");
+                    ItemJnlLine.SetRange("Journal Batch Name", rec."Journal Batch Name");
+                    REPORT.RunModal(REPORT::"MRC Inventory Movement", true, true, ItemJnlLine);
+                end;
+            }
+        }
+
 
         addfirst(processing)
         {
@@ -64,6 +86,7 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
                 ApplicationArea = all;
                 ToolTip = 'Executes the TEST Json action.';
                 Caption = 'Send API';
+                Visible = false;
                 trigger OnAction()
                 var
                     ItemJournalLine: Record "Item Journal Line";
@@ -319,6 +342,10 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
 
 
         }
+        addafter("&Print_Promoted")
+        {
+            actionref(InventoryMovementPrint_Promote; "InventoryMovementPrint") { }
+        }
         addfirst(Category_Category12)
         {
 
@@ -375,7 +402,9 @@ pageextension 75000 "YVS Item Journal" extends "Item Journal"
             Caption = 'Approve Entries';
         }
 
+
     }
+
     trigger OnOpenPage()
     begin
         if not gvIsBatch then

@@ -10,7 +10,14 @@
   "help": "",
   "url": "",
   "logo": "./YVS-logo-01.jpg",
-  "dependencies": [],
+  "dependencies": [
+    {
+      "id": "c80e25ac-8f80-4d65-85b9-211b292609b8",
+      "publisher": "Yokogawa Votiva Solutions Co., Ltd.",
+      "name": "Thai Localized",
+      "version": "23.0.3.7"
+    }
+  ],
   "screenshots": [],
   "platform": "1.0.0.0",
   "application": "24.0.0.0",

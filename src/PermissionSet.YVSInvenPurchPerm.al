@@ -9,6 +9,7 @@ permissionset 75000 YVS_Inven_Purch_Perm
         table "YVS Tracking Speci. Buffer" = X,
         tabledata "YVS Tracking Speci. Buffer" = RMID,
         codeunit "YVS Inven & Purchase Func" = X,
+        report "MRC Inventory Movement" = X,
         page "YVS API Transfer Order" = X,
         page "YVS API Tracking Specification" = X,
         page "YVS API Transfer Order Subform" = X;
