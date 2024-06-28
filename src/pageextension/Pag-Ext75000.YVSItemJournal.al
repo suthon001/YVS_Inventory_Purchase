@@ -76,6 +76,11 @@ pageextension 75000 "YVS Item Journal2" extends "Item Journal"
                 end;
             }
         }
+        modify(YVSPrint)
+        {
+            Visible = false;
+        }
+
 
 
         addfirst(processing)

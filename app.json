@@ -2,7 +2,7 @@
   "id": "93c032be-d224-422f-9bb9-b4ed605042c0",
   "name": "Purchase and Inventory",
   "publisher": "Yokogawa Votiva Solutions Co., Ltd.",
-  "version": "1.0.0.9",
+  "version": "1.0.0.10",
   "brief": "",
   "description": "",
   "privacyStatement": "",
@@ -15,7 +15,7 @@
       "id": "c80e25ac-8f80-4d65-85b9-211b292609b8",
       "publisher": "Yokogawa Votiva Solutions Co., Ltd.",
       "name": "Thai Localized",
-      "version": "23.0.3.7"
+      "version": "24.0.1.4"
     }
   ],
   "screenshots": [],

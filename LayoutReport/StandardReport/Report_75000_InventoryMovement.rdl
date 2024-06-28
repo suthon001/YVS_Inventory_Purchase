@@ -11,166 +11,6 @@
       <rd:DataSourceID>3c51d83e-ae05-4caa-a5b2-24d22b93aea9</rd:DataSourceID>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="JournalTempName_ItemJournalBatch">
-          <DataField>JournalTempName_ItemJournalBatch</DataField>
-        </Field>
-        <Field Name="Name_ItemJournalBatch">
-          <DataField>Name_ItemJournalBatch</DataField>
-        </Field>
-        <Field Name="InventoryMovementCaption">
-          <DataField>InventoryMovementCaption</DataField>
-        </Field>
-        <Field Name="PageCaption">
-          <DataField>PageCaption</DataField>
-        </Field>
-        <Field Name="JournalTempNameFieldCaption">
-          <DataField>JournalTempNameFieldCaption</DataField>
-        </Field>
-        <Field Name="JournalBatchNameFieldCaption">
-          <DataField>JournalBatchNameFieldCaption</DataField>
-        </Field>
-        <Field Name="CompanyName">
-          <DataField>CompanyName</DataField>
-        </Field>
-        <Field Name="TodayFormatted">
-          <DataField>TodayFormatted</DataField>
-        </Field>
-        <Field Name="Time">
-          <DataField>Time</DataField>
-        </Field>
-        <Field Name="YVS_Approve_Status">
-          <DataField>YVS_Approve_Status</DataField>
-        </Field>
-        <Field Name="JournalTempName_ItemJournalLine">
-          <DataField>JournalTempName_ItemJournalLine</DataField>
-        </Field>
-        <Field Name="JournalBatchName_ItemJournalLine">
-          <DataField>JournalBatchName_ItemJournalLine</DataField>
-        </Field>
-        <Field Name="Document_No_">
-          <DataField>Document_No_</DataField>
-        </Field>
-        <Field Name="ActivityType">
-          <DataField>ActivityType</DataField>
-        </Field>
-        <Field Name="ItemJnlLineActTypeShowOutput">
-          <DataField>ItemJnlLineActTypeShowOutput</DataField>
-        </Field>
-        <Field Name="ItemJournalLineTableCaption">
-          <DataField>ItemJournalLineTableCaption</DataField>
-        </Field>
-        <Field Name="ItemJnlLineFilter">
-          <DataField>ItemJnlLineFilter</DataField>
-        </Field>
-        <Field Name="ItemJnlLineHeader1ShowOutput">
-          <DataField>ItemJnlLineHeader1ShowOutput</DataField>
-        </Field>
-        <Field Name="ItemJnlLineHeader2ShowOutput">
-          <DataField>ItemJnlLineHeader2ShowOutput</DataField>
-        </Field>
-        <Field Name="UOM_ItemJournalLine">
-          <DataField>UOM_ItemJournalLine</DataField>
-        </Field>
-        <Field Name="Qty_ItemJournalLine">
-          <DataField>Qty_ItemJournalLine</DataField>
-        </Field>
-        <Field Name="Qty_ItemJournalLineFormat">
-          <DataField>Qty_ItemJournalLineFormat</DataField>
-        </Field>
-        <Field Name="BinCode_ItemJournalLine">
-          <DataField>BinCode_ItemJournalLine</DataField>
-        </Field>
-        <Field Name="LocationCode_ItemJournalLine">
-          <DataField>LocationCode_ItemJournalLine</DataField>
-        </Field>
-        <Field Name="VariantCode_ItemJournalLine">
-          <DataField>VariantCode_ItemJournalLine</DataField>
-        </Field>
-        <Field Name="Description_ItemJournalLine">
-          <DataField>Description_ItemJournalLine</DataField>
-        </Field>
-        <Field Name="ItemNo_ItemJournalLine">
-          <DataField>ItemNo_ItemJournalLine</DataField>
-        </Field>
-        <Field Name="PostingDate_ItemJournalLine">
-          <DataField>PostingDate_ItemJournalLine</DataField>
-        </Field>
-        <Field Name="EntryType_ItemJournalLine">
-          <DataField>EntryType_ItemJournalLine</DataField>
-        </Field>
-        <Field Name="QuantityBase_ItemJournalLine">
-          <DataField>QuantityBase_ItemJournalLine</DataField>
-        </Field>
-        <Field Name="QuantityBase_ItemJournalLineFormat">
-          <DataField>QuantityBase_ItemJournalLineFormat</DataField>
-        </Field>
-        <Field Name="QuantityFormat">
-          <DataField>QuantityFormat</DataField>
-        </Field>
-        <Field Name="QuantityFormatFormat">
-          <DataField>QuantityFormatFormat</DataField>
-        </Field>
-        <Field Name="NewBinCode_ItemJournalLine">
-          <DataField>NewBinCode_ItemJournalLine</DataField>
-        </Field>
-        <Field Name="NewLocationCode_ItemJournalLine">
-          <DataField>NewLocationCode_ItemJournalLine</DataField>
-        </Field>
-        <Field Name="QuantityBaseFormat">
-          <DataField>QuantityBaseFormat</DataField>
-        </Field>
-        <Field Name="QuantityBaseFormatFormat">
-          <DataField>QuantityBaseFormatFormat</DataField>
-        </Field>
-        <Field Name="ActivityTypeCaption">
-          <DataField>ActivityTypeCaption</DataField>
-        </Field>
-        <Field Name="UOMFieldCaption">
-          <DataField>UOMFieldCaption</DataField>
-        </Field>
-        <Field Name="QtyFieldCaption">
-          <DataField>QtyFieldCaption</DataField>
-        </Field>
-        <Field Name="BinCodeFieldCaption">
-          <DataField>BinCodeFieldCaption</DataField>
-        </Field>
-        <Field Name="LocationCodeFieldCaption">
-          <DataField>LocationCodeFieldCaption</DataField>
-        </Field>
-        <Field Name="VariantCodeFieldCaption">
-          <DataField>VariantCodeFieldCaption</DataField>
-        </Field>
-        <Field Name="DescriptionFieldCaption">
-          <DataField>DescriptionFieldCaption</DataField>
-        </Field>
-        <Field Name="ItemNoFieldCaption">
-          <DataField>ItemNoFieldCaption</DataField>
-        </Field>
-        <Field Name="PostingDateCaption">
-          <DataField>PostingDateCaption</DataField>
-        </Field>
-        <Field Name="EntryTypeFieldCaption">
-          <DataField>EntryTypeFieldCaption</DataField>
-        </Field>
-        <Field Name="QuantityBaseFieldCaption">
-          <DataField>QuantityBaseFieldCaption</DataField>
-        </Field>
-        <Field Name="NewBinCodeFieldCaption">
-          <DataField>NewBinCodeFieldCaption</DataField>
-        </Field>
-        <Field Name="NewLocationCodeFieldCaption">
-          <DataField>NewLocationCodeFieldCaption</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -3091,12 +2931,6 @@ Fields!JournalBatchName_ItemJournalLine.Value)</Hidden>
       </Page>
     </ReportSection>
   </ReportSections>
-  <ReportParametersLayout>
-    <GridLayoutDefinition>
-      <NumberOfColumns>4</NumberOfColumns>
-      <NumberOfRows>2</NumberOfRows>
-    </GridLayoutDefinition>
-  </ReportParametersLayout>
   <Code>Public Function BlankZero(ByVal Value As Decimal)
     if Value = 0 then
         Return ""
@@ -3175,4 +3009,164 @@ End Function</Code>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
   <rd:ReportID>cce7d137-a91a-4da5-9c96-f167796084f9</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="JournalTempName_ItemJournalBatch">
+          <DataField>JournalTempName_ItemJournalBatch</DataField>
+        </Field>
+        <Field Name="Name_ItemJournalBatch">
+          <DataField>Name_ItemJournalBatch</DataField>
+        </Field>
+        <Field Name="InventoryMovementCaption">
+          <DataField>InventoryMovementCaption</DataField>
+        </Field>
+        <Field Name="PageCaption">
+          <DataField>PageCaption</DataField>
+        </Field>
+        <Field Name="JournalTempNameFieldCaption">
+          <DataField>JournalTempNameFieldCaption</DataField>
+        </Field>
+        <Field Name="JournalBatchNameFieldCaption">
+          <DataField>JournalBatchNameFieldCaption</DataField>
+        </Field>
+        <Field Name="CompanyName">
+          <DataField>CompanyName</DataField>
+        </Field>
+        <Field Name="TodayFormatted">
+          <DataField>TodayFormatted</DataField>
+        </Field>
+        <Field Name="Time">
+          <DataField>Time</DataField>
+        </Field>
+        <Field Name="YVS_Approve_Status">
+          <DataField>YVS_Approve_Status</DataField>
+        </Field>
+        <Field Name="JournalTempName_ItemJournalLine">
+          <DataField>JournalTempName_ItemJournalLine</DataField>
+        </Field>
+        <Field Name="JournalBatchName_ItemJournalLine">
+          <DataField>JournalBatchName_ItemJournalLine</DataField>
+        </Field>
+        <Field Name="Document_No_">
+          <DataField>Document_No_</DataField>
+        </Field>
+        <Field Name="ActivityType">
+          <DataField>ActivityType</DataField>
+        </Field>
+        <Field Name="ItemJnlLineActTypeShowOutput">
+          <DataField>ItemJnlLineActTypeShowOutput</DataField>
+        </Field>
+        <Field Name="ItemJournalLineTableCaption">
+          <DataField>ItemJournalLineTableCaption</DataField>
+        </Field>
+        <Field Name="ItemJnlLineFilter">
+          <DataField>ItemJnlLineFilter</DataField>
+        </Field>
+        <Field Name="ItemJnlLineHeader1ShowOutput">
+          <DataField>ItemJnlLineHeader1ShowOutput</DataField>
+        </Field>
+        <Field Name="ItemJnlLineHeader2ShowOutput">
+          <DataField>ItemJnlLineHeader2ShowOutput</DataField>
+        </Field>
+        <Field Name="UOM_ItemJournalLine">
+          <DataField>UOM_ItemJournalLine</DataField>
+        </Field>
+        <Field Name="Qty_ItemJournalLine">
+          <DataField>Qty_ItemJournalLine</DataField>
+        </Field>
+        <Field Name="Qty_ItemJournalLineFormat">
+          <DataField>Qty_ItemJournalLineFormat</DataField>
+        </Field>
+        <Field Name="BinCode_ItemJournalLine">
+          <DataField>BinCode_ItemJournalLine</DataField>
+        </Field>
+        <Field Name="LocationCode_ItemJournalLine">
+          <DataField>LocationCode_ItemJournalLine</DataField>
+        </Field>
+        <Field Name="VariantCode_ItemJournalLine">
+          <DataField>VariantCode_ItemJournalLine</DataField>
+        </Field>
+        <Field Name="Description_ItemJournalLine">
+          <DataField>Description_ItemJournalLine</DataField>
+        </Field>
+        <Field Name="ItemNo_ItemJournalLine">
+          <DataField>ItemNo_ItemJournalLine</DataField>
+        </Field>
+        <Field Name="PostingDate_ItemJournalLine">
+          <DataField>PostingDate_ItemJournalLine</DataField>
+        </Field>
+        <Field Name="EntryType_ItemJournalLine">
+          <DataField>EntryType_ItemJournalLine</DataField>
+        </Field>
+        <Field Name="QuantityBase_ItemJournalLine">
+          <DataField>QuantityBase_ItemJournalLine</DataField>
+        </Field>
+        <Field Name="QuantityBase_ItemJournalLineFormat">
+          <DataField>QuantityBase_ItemJournalLineFormat</DataField>
+        </Field>
+        <Field Name="QuantityFormat">
+          <DataField>QuantityFormat</DataField>
+        </Field>
+        <Field Name="QuantityFormatFormat">
+          <DataField>QuantityFormatFormat</DataField>
+        </Field>
+        <Field Name="NewBinCode_ItemJournalLine">
+          <DataField>NewBinCode_ItemJournalLine</DataField>
+        </Field>
+        <Field Name="NewLocationCode_ItemJournalLine">
+          <DataField>NewLocationCode_ItemJournalLine</DataField>
+        </Field>
+        <Field Name="QuantityBaseFormat">
+          <DataField>QuantityBaseFormat</DataField>
+        </Field>
+        <Field Name="QuantityBaseFormatFormat">
+          <DataField>QuantityBaseFormatFormat</DataField>
+        </Field>
+        <Field Name="ActivityTypeCaption">
+          <DataField>ActivityTypeCaption</DataField>
+        </Field>
+        <Field Name="UOMFieldCaption">
+          <DataField>UOMFieldCaption</DataField>
+        </Field>
+        <Field Name="QtyFieldCaption">
+          <DataField>QtyFieldCaption</DataField>
+        </Field>
+        <Field Name="BinCodeFieldCaption">
+          <DataField>BinCodeFieldCaption</DataField>
+        </Field>
+        <Field Name="LocationCodeFieldCaption">
+          <DataField>LocationCodeFieldCaption</DataField>
+        </Field>
+        <Field Name="VariantCodeFieldCaption">
+          <DataField>VariantCodeFieldCaption</DataField>
+        </Field>
+        <Field Name="DescriptionFieldCaption">
+          <DataField>DescriptionFieldCaption</DataField>
+        </Field>
+        <Field Name="ItemNoFieldCaption">
+          <DataField>ItemNoFieldCaption</DataField>
+        </Field>
+        <Field Name="PostingDateCaption">
+          <DataField>PostingDateCaption</DataField>
+        </Field>
+        <Field Name="EntryTypeFieldCaption">
+          <DataField>EntryTypeFieldCaption</DataField>
+        </Field>
+        <Field Name="QuantityBaseFieldCaption">
+          <DataField>QuantityBaseFieldCaption</DataField>
+        </Field>
+        <Field Name="NewBinCodeFieldCaption">
+          <DataField>NewBinCodeFieldCaption</DataField>
+        </Field>
+        <Field Name="NewLocationCodeFieldCaption">
+          <DataField>NewLocationCodeFieldCaption</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>
