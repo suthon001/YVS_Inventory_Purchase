@@ -5,6 +5,21 @@ pageextension 75006 "YVS Value Entries" extends "Value Entries"
 {
     layout
     {
+        modify("Cost Amount (Actual) (ACY)")
+        {
+            Visible = IsHideValue;
+            HideValue = NOT IsHideValue;
+        }
+        modify("Cost Amount (Expected) (ACY)")
+        {
+            Visible = IsHideValue;
+            HideValue = NOT IsHideValue;
+        }
+        modify("Cost Amount (Non-Invtbl.)(ACY)")
+        {
+            Visible = IsHideValue;
+            HideValue = NOT IsHideValue;
+        }
         modify("Cost Amount (Actual)")
         {
             Visible = IsHideValue;
