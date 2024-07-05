@@ -3,6 +3,13 @@
 /// </summary>
 codeunit 75000 "YVS Inven & Purchase Func"
 {
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Approvals Mgmt.", 'OnBeforeShowCommonApprovalStatus', '', false, false)]
+    local procedure OnBeforeShowCommonApprovalStatus(var IsHandle: Boolean; var RecRef: RecordRef)
+    begin
+        if RecRef.Number = Database::"Item Journal Line" then
+            IsHandle := true;
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Batch", 'OnBeforeCode', '', false, false)]
     local procedure OnBeforeCodeITemJournal(var ItemJournalLine: Record "Item Journal Line")
     var

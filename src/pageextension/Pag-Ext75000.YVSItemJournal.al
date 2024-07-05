@@ -170,16 +170,22 @@ pageextension 75000 "YVS Item Journal2" extends "Item Journal"
                         trigger OnAction()
                         var
                             JournalBatch: Record "Item Journal Batch";
+                            ITemJournalLine: Record "Item Journal Line";
                         begin
-                            if not rec."YVS Is Batch" then
-                                ApprovalsMgmt.ApproveRecordApprovalRequest(rec.RecordId)
-                            else begin
-                                JournalBatch.reset();
-                                JournalBatch.SetRange("Journal Template Name", rec."Journal Template Name");
-                                JournalBatch.SetRange(Name, rec."Journal Batch Name");
-                                if JournalBatch.FindFirst() then
-                                    ApprovalsMgmt.ApproveRecordApprovalRequest(JournalBatch.RecordId);
-                            end;
+                            ITemJournalLine.copy(rec);
+                            CurrPage.SetSelectionFilter(ITemJournalLine);
+                            if ITemJournalLine.FindSet() then
+                                repeat
+                                    if not ITemJournalLine."YVS Is Batch" then
+                                        ApprovalsMgmt.ApproveRecordApprovalRequest(ITemJournalLine.RecordId)
+                                    else begin
+                                        JournalBatch.reset();
+                                        JournalBatch.SetRange("Journal Template Name", ITemJournalLine."Journal Template Name");
+                                        JournalBatch.SetRange(Name, ITemJournalLine."Journal Batch Name");
+                                        if JournalBatch.FindFirst() then
+                                            ApprovalsMgmt.ApproveRecordApprovalRequest(JournalBatch.RecordId);
+                                    end;
+                                until ITemJournalLine.Next() = 0;
                         end;
                     }
                     action(Reject)
@@ -291,9 +297,26 @@ pageextension 75000 "YVS Item Journal2" extends "Item Journal"
                             Caption = 'Journal by Line';
                             ToolTip = 'Executes the Send A&pproval Requst action.';
                             trigger OnAction()
+                            var
+                                ItemJornaline: Record "Item Journal Line";
+                                PendingApprovalMsg: Label 'An approval request has been sent.';
+                                CheckMessage: Boolean;
                             begin
-                                if Rec.CheckWorkflowItemJournalEnabled(Rec) then
-                                    Rec.OnSendItemJournalforApproval(rec);
+                                CheckMessage := false;
+                                ItemJornaline.copy(Rec);
+                                CurrPage.SetSelectionFilter(ItemJornaline);
+                                ItemJornaline.SetRange("YVS Approve Status", ItemJornaline."YVS Approve Status"::Open);
+                                ItemJornaline.SetFilter("Item No.", '<>%1', '');
+                                ItemJornaline.SetFilter(quantity, '<>%1', 0);
+                                if ItemJornaline.FindSet() then
+                                    repeat
+                                        if Rec.CheckWorkflowItemJournalEnabled(ItemJornaline) then begin
+                                            Rec.OnSendItemJournalforApproval(ItemJornaline);
+                                            CheckMessage := true;
+                                        end;
+                                    until ItemJornaline.Next() = 0;
+                                if CheckMessage then
+                                    Message(PendingApprovalMsg);
                             end;
                         }
                     }
