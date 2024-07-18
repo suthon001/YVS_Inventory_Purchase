@@ -15,7 +15,16 @@ tableextension 75004 "YVS Purchase Line" extends "Purchase Line"
         {
             trigger OnAfterValidate()
             begin
-                rec."YVS Direct Unit Cost" := rec."Direct Unit Cost";
+                if rec."Document Type" = rec."Document Type"::Order then
+                    rec."YVS Direct Unit Cost" := rec."Direct Unit Cost";
+            end;
+        }
+        modify(Quantity)
+        {
+            trigger OnBeforeValidate()
+            begin
+                if rec."Document Type" = rec."Document Type"::Order then
+                    rec."Direct Unit Cost" := rec."YVS Direct Unit Cost";
             end;
         }
     }
