@@ -53,6 +53,7 @@ pageextension 75009 "YVS Purchase Order Subform" extends "Purchase Order Subform
                 end;
             }
         }
+
     }
     trigger OnOpenPage()
     begin

@@ -14,17 +14,23 @@ tableextension 75004 "YVS Purchase Line" extends "Purchase Line"
         modify("Direct Unit Cost")
         {
             trigger OnAfterValidate()
+            var
+                InvenPurchFunc: Codeunit "YVS Inven & Purchase Func";
             begin
-                if rec."Document Type" = rec."Document Type"::Order then
-                    rec."YVS Direct Unit Cost" := rec."Direct Unit Cost";
+                if NOT InvenPurchFunc.CheckPermissionItemInVisible() then
+                    if rec."Document Type" = rec."Document Type"::Order then
+                        rec."YVS Direct Unit Cost" := rec."Direct Unit Cost";
             end;
         }
         modify(Quantity)
         {
             trigger OnBeforeValidate()
+            var
+                InvenPurchFunc: Codeunit "YVS Inven & Purchase Func";
             begin
-                if rec."Document Type" = rec."Document Type"::Order then
-                    rec."Direct Unit Cost" := rec."YVS Direct Unit Cost";
+                if NOT InvenPurchFunc.CheckPermissionItemInVisible() then
+                    if rec."Document Type" = rec."Document Type"::Order then
+                        rec."Direct Unit Cost" := rec."YVS Direct Unit Cost";
             end;
         }
     }
