@@ -17,12 +17,13 @@ codeunit 75000 "YVS Inven & Purchase Func"
         Text002Msg: Label 'This document can only be released when the approval process is complete.';
     begin
         ItemJnlLine.LockTable();
+        ItemJnlLine.CopyFilters(ItemJournalLine);
         ItemJnlLine.SetRange("Journal Template Name", ItemJournalLine."Journal Template Name");
         ItemJnlLine.SetRange("Journal Batch Name", ItemJournalLine."Journal Batch Name");
         if ItemJnlLine.FindSet() then
             repeat
-                if ItemJnlLine.IsItemItemJournalEnabled(ItemJnlLine) then
-                    if ItemJnlLine."YVS Approve Status" <> ItemJnlLine."YVS Approve Status"::Released then
+                if ItemJnlLine."YVS Approve Status" <> ItemJnlLine."YVS Approve Status"::Released then
+                    if ItemJnlLine.IsItemItemJournalEnabled(ItemJnlLine) then
                         ERROR(Text002Msg);
 
             until ItemJnlLine.Next() = 0;
