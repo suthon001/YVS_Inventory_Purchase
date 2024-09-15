@@ -35,7 +35,7 @@
             "request": "launch",
             "type": "al",
             "environmentType": "Sandbox",
-            "environmentName": "sandbox3",
+            "environmentName": "SandBox03",
             "startupObjectId": 22,
             "startupObjectType": "Page",
             "breakOnError": true,
