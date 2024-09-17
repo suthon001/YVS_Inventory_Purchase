@@ -37,8 +37,16 @@ pageextension 75011 "YVS Purchase Lines" extends "Purchase Lines"
 
     }
     trigger OnOpenPage()
+    var
+        UserSetupMgt: Codeunit "User Setup Management";
     begin
         IsHideValue := InvenPurchFunc.CheckPermissionItemInVisible();
+        if (UserSetupMgt.GetPurchasesFilter() <> '') then begin
+            rec.FilterGroup(2);
+            rec.SetRange("Responsibility Center", UserSetupMgt.GetPurchasesFilter());
+            rec.FilterGroup(0);
+        end;
+
     end;
 
     var
