@@ -5,7 +5,7 @@ tableextension 75008 "YVS Location" extends Location
 {
     fields
     {
-        field(70000; "YVS Main"; Boolean)
+        field(75000; "YVS Main"; Boolean)
         {
             Caption = 'Main';
             DataClassification = ToBeClassified;

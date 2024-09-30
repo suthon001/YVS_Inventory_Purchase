@@ -60,7 +60,7 @@ tableextension 75007 "YVS Transfer Receipt Header" extends "Transfer Receipt Hea
             DataClassification = CustomerContent;
             Editable = false;
         }
-        field(75020; "YVS BC_Entry_Ref"; Integer)
+        field(75010; "YVS BC_Entry_Ref"; Integer)
         {
             Caption = 'BC_Entry_Ref';
             DataClassification = CustomerContent;

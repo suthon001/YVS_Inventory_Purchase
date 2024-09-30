@@ -5,7 +5,7 @@ tableextension 75013 "YVS No. Series" extends "No. Series"
 {
     fields
     {
-        field(70000; "YVS Interface"; Boolean)
+        field(75000; "YVS Interface"; Boolean)
         {
             Caption = 'Interface';
             DataClassification = CustomerContent;

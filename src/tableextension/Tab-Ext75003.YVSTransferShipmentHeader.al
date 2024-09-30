@@ -56,7 +56,7 @@ tableextension 75003 "YVS Transfer Shipment Header" extends "Transfer Shipment H
             DataClassification = CustomerContent;
             Editable = false;
         }
-        field(75020; "YVS BC_Entry_Ref"; Integer)
+        field(75010; "YVS BC_Entry_Ref"; Integer)
         {
             Caption = 'BC_Entry_Ref';
             DataClassification = CustomerContent;

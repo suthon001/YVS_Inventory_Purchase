@@ -131,7 +131,7 @@ pageextension 75000 "YVS Item Journal2" extends "Item Journal"
                     ItemJnlLine.Copy(Rec);
                     ItemJnlLine.SetRange("Journal Template Name", rec."Journal Template Name");
                     ItemJnlLine.SetRange("Journal Batch Name", rec."Journal Batch Name");
-                    REPORT.RunModal(REPORT::"YVS Inventory Movement", true, true, ItemJnlLine);
+                    REPORT.RunModal(REPORT::"MRC Inventory Movement", true, true, ItemJnlLine);
                 end;
             }
         }

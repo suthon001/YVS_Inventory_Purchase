@@ -5,68 +5,68 @@ tableextension 75009 "YVS Item Ledger Entry" extends "Item Ledger Entry"
 {
     fields
     {
-        field(70000; "YVS Ship-to Name"; Text[200])
+        field(75000; "YVS Ship-to Name"; Text[200])
         {
             Caption = 'Ship-to Name';
             DataClassification = CustomerContent;
         }
-        field(70001; "YVS Ship-to Address"; Text[255])
+        field(75001; "YVS Ship-to Address"; Text[255])
         {
             Caption = 'Ship-to Address';
             DataClassification = CustomerContent;
         }
-        field(70002; "YVS Ship-to District"; Text[50])
+        field(75002; "YVS Ship-to District"; Text[50])
         {
             Caption = 'Ship-to District';
             DataClassification = CustomerContent;
         }
-        field(70003; "YVS Ship-to Post Code"; Text[20])
+        field(75003; "YVS Ship-to Post Code"; Text[20])
         {
             Caption = 'Ship-to Post Code';
             DataClassification = CustomerContent;
         }
-        field(70004; "YVS Ship-to Mobile No."; Text[50])
+        field(75004; "YVS Ship-to Mobile No."; Text[50])
         {
             Caption = 'Ship-to Mobile No.';
             DataClassification = CustomerContent;
         }
-        field(70005; "YVS Ship-to Phone No."; Text[20])
+        field(75005; "YVS Ship-to Phone No."; Text[20])
         {
             Caption = 'Ship-to Phone No.';
             DataClassification = CustomerContent;
         }
-        field(70006; "YVS Shipment Date"; Date)
+        field(75006; "YVS Shipment Date"; Date)
         {
             DataClassification = CustomerContent;
             Caption = 'Shipment Date';
         }
-        field(70007; "YVS Shipping Agent"; code[10])
+        field(75007; "YVS Shipping Agent"; code[10])
         {
             TableRelation = "Shipping Agent".Code;
             DataClassification = CustomerContent;
             Caption = 'Shipping Agent';
         }
-        field(70008; "YVS Direction"; enum "YVS Direction")
+        field(75008; "YVS Direction"; enum "YVS Direction")
         {
             Caption = 'Direction';
             DataClassification = CustomerContent;
         }
-        field(70010; "YVS Transaction ID"; Integer)
+        field(75009; "YVS Transaction ID"; Integer)
         {
             Caption = 'Transaction ID';
             Editable = false;
         }
-        field(70011; "YVS Original Quantity"; Decimal)
+        field(75010; "YVS Original Quantity"; Decimal)
         {
             Caption = 'Original Quantity';
             DataClassification = CustomerContent;
         }
-        field(70012; "YVS Address"; Text[250])
+        field(75011; "YVS Address"; Text[250])
         {
             Caption = 'Address';
             DataClassification = CustomerContent;
         }
-        field(70013; "YVS BC_Entry_Ref"; Integer)
+        field(75012; "YVS BC_Entry_Ref"; Integer)
         {
             Caption = 'BC_Entry_Ref';
             DataClassification = CustomerContent;
