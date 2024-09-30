@@ -13,4 +13,8 @@ enum 75002 "YVS Interface Document Type"
     {
         Caption = 'Item Journal';
     }
+    value(2; "Transfer Line")
+    {
+        Caption = 'Transfer Line';
+    }
 }

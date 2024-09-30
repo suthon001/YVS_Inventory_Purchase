@@ -246,6 +246,10 @@ report 75000 "MRC Inventory Movement"
         PostingDateCaptionLbl: Label 'Posting Date';
         Status: Text;
 
+    /// <summary>
+    /// InitializeRequest.
+    /// </summary>
+    /// <param name="NewActivityType">Option.</param>
     procedure InitializeRequest(NewActivityType: Option)
     begin
         ActivityType := NewActivityType;

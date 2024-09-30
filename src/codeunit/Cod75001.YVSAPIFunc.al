@@ -5,6 +5,134 @@ codeunit 75001 "YVS Api Func"
 {
 
     /// <summary>
+    /// TryUpdateToItemJournal.
+    /// </summary>
+    /// <param name="pJsonObject">JsonObject.</param>
+    /// <returns>Return value of type Boolean.</returns>
+    procedure TryUpdateToItemJournal(pJsonObject: JsonObject): Boolean
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+        JsonText: Text;
+        InboundItemJournal: Text;
+        ltActionPage: Enum "YVS Interface Document Type";
+        ltDicBatch: Dictionary of [code[20], List of [Integer]];
+        ltDirection: Option "Inbound","Outbound";
+        ltMethodType: Option " ","Insert","Update","Delete";
+        ltItemJournalTemplate: code[10];
+    begin
+        if EnvironmentInformation.IsProduction() then
+            InboundItemJournal := 'https://api.businesscentral.dynamics.com/v2.0/4ef4cef4-feda-4adf-a799-109703e11237/production/api/interface/bc/v1.0/itemjournals?company=''' + CompanyName() + ''
+        else
+            InboundItemJournal := 'https://api.businesscentral.dynamics.com/v2.0/4ef4cef4-feda-4adf-a799-109703e11237/' + EnvironmentInformation.GetEnvironmentName() + '/api/interface/bc/v1.0/itemjournals?company=''' + CompanyName() + '''';
+        if UpdateToITemJournal(pJsonObject, JsonText, ltItemJournalTemplate, ltDicBatch) then
+            InsertToInterfaceLog(0, ltActionPage::"Item Journal", ltItemJournalTemplate, ltDicBatch, JsonText, ltDirection::Inbound, '', COPYSTR(InboundItemJournal, 1, 250), ltMethodType::Update)
+        else begin
+            InsertToInterfaceLog(1, ltActionPage::"Item Journal", ltItemJournalTemplate, ltDicBatch, JsonText, ltDirection::Inbound, GetLastErrorText(), COPYSTR(InboundItemJournal, 1, 250), ltMethodType::Update);
+            Commit();
+            Error(GetLastErrorText());
+        end;
+        exit(true);
+    end;
+
+    [TryFunction]
+    local procedure UpdateToITemJournal(pJsonObject: JsonObject; var pJsonText: Text; var pTemplateName: code[10]; var pDicBatch: Dictionary of [code[20], List of [Integer]])
+    var
+        ltItemJournalLine: Record "Item Journal Line";
+        JsonMgt: Codeunit "JSON Management";
+        ltbatchName: code[10];
+        ltLineNo: Integer;
+        ltQuantity: Decimal;
+        ltListOfInteger: List of [Integer];
+    begin
+        pJsonText := '';
+        if pJsonObject.WriteTo(pJsonText) then begin
+            ltQuantity := 0;
+            JsonMgt.InitializeObject(pJsonText);
+            pTemplateName := COPYSTR(JsonMgt.GetValue('$.templateName'), 1, 10);
+            ltbatchName := COPYSTR(JsonMgt.GetValue('$.batchName'), 1, 10);
+            if Evaluate(ltLineNo, JsonMgt.GetValue('$.lineNo')) then;
+            ltListOfInteger.Add(ltLineNo);
+            pDicBatch.Add(ltbatchName, ltListOfInteger);
+            ltItemJournalLine.GET(pTemplateName, ltbatchName, ltLineNo);
+            if JsonMgt.GetValue('$.quantity') <> '' then
+                Evaluate(ltQuantity, JsonMgt.GetValue('$.quantity'));
+            ltItemJournalLine.Validate(Quantity, ltQuantity);
+            ltItemJournalLine.Modify();
+        end else begin
+            JsonMgt.InitializeObject(pJsonText);
+            pTemplateName := COPYSTR(JsonMgt.GetValue('$.templateName'), 1, 10);
+            ltbatchName := COPYSTR(JsonMgt.GetValue('$.batchName'), 1, 10);
+            if Evaluate(ltLineNo, JsonMgt.GetValue('$.lineNo')) then;
+            ltListOfInteger.Add(ltLineNo);
+            pDicBatch.Add(ltbatchName, ltListOfInteger);
+        end;
+    end;
+
+
+    /// <summary>
+    /// TryUpdateToTransferOrder.
+    /// </summary>
+    /// <param name="pJsonObject">JsonObject.</param>
+    /// <returns>Return value of type Boolean.</returns>
+    procedure TryUpdateToTransferOrder(pJsonObject: JsonObject): Boolean
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+        JsonText: Text;
+        InboundTransferOrder: Text;
+        ltActionPage: Enum "YVS Interface Document Type";
+        ltDicBatch: Dictionary of [code[20], List of [Integer]];
+        ltDirection: Option "Inbound","Outbound";
+        ltMethodType: Option " ","Insert","Update","Delete";
+    begin
+        if EnvironmentInformation.IsProduction() then
+            InboundTransferOrder := 'https://api.businesscentral.dynamics.com/v2.0/4ef4cef4-feda-4adf-a799-109703e11237/production/api/interface/bc/v1.0/transferOrders?company=''' + CompanyName() + ''
+        else
+            InboundTransferOrder := 'https://api.businesscentral.dynamics.com/v2.0/4ef4cef4-feda-4adf-a799-109703e11237/' + EnvironmentInformation.GetEnvironmentName() + '/api/interface/bc/v1.0/transferOrders?company=''' + CompanyName() + '''';
+        if UpdateToTransferOrder(pJsonObject, JsonText, ltDicBatch) then
+            InsertToInterfaceLog(0, ltActionPage::"Transfer Line", '', ltDicBatch, JsonText, ltDirection::Inbound, '', COPYSTR(InboundTransferOrder, 1, 250), ltMethodType::Update)
+        else begin
+            InsertToInterfaceLog(1, ltActionPage::"Transfer Line", '', ltDicBatch, JsonText, ltDirection::Inbound, GetLastErrorText(), COPYSTR(InboundTransferOrder, 1, 250), ltMethodType::Update);
+            Commit();
+            Error(GetLastErrorText());
+        end;
+        exit(true);
+    end;
+
+    [TryFunction]
+    local procedure UpdateToTransferOrder(pJsonObject: JsonObject; var pJsonText: Text; var pDicBatch: Dictionary of [code[20], List of [Integer]])
+    var
+        ltTransferLine: Record "Transfer Line";
+        JsonMgt: Codeunit "JSON Management";
+        ltDocumentNo: code[20];
+        ltLineNo: Integer;
+        ltQuantity: Decimal;
+        ltListOfInteger: List of [Integer];
+    begin
+        pJsonText := '';
+        if pJsonObject.WriteTo(pJsonText) then begin
+            ltQuantity := 0;
+            JsonMgt.InitializeObject(pJsonText);
+            ltDocumentNo := COPYSTR(JsonMgt.GetValue('$.documentNo'), 1, 20);
+            if Evaluate(ltLineNo, JsonMgt.GetValue('$.lineNo')) then;
+
+            ltListOfInteger.Add(ltLineNo);
+            pDicBatch.Add(ltDocumentNo, ltListOfInteger);
+
+            ltTransferLine.GET(ltDocumentNo, ltLineNo);
+            if JsonMgt.GetValue('$.quantityUpdate') <> '' then
+                Evaluate(ltQuantity, JsonMgt.GetValue('$.quantityUpdate'));
+            ltTransferLine.Validate(Quantity, ltQuantity);
+            ltTransferLine.Modify();
+        end else begin
+            JsonMgt.InitializeObject(pJsonText);
+            ltDocumentNo := COPYSTR(JsonMgt.GetValue('$.documentNo'), 1, 20);
+            if Evaluate(ltLineNo, JsonMgt.GetValue('$.lineNo')) then;
+            ltListOfInteger.Add(ltLineNo);
+            pDicBatch.Add(ltDocumentNo, ltListOfInteger);
+
+        end;
+    end;
+    /// <summary>
     /// JobQueueItemJournal.
     /// </summary>
     procedure JobQueueItemJournal()
@@ -154,7 +282,10 @@ codeunit 75001 "YVS Api Func"
         CallWebService(ltDocumentType::Transfer, Result, '', DicBatch, ltDirection::Outbound);
     end;
 
-    local procedure CallWebService(pActionPage: Enum "YVS Interface Document Type"; pPayload: Text; pJournalTemplate: code[10]; pDicBatch: Dictionary of [code[20], List of [Integer]]; pDirection: Option "Inbound","Outbound")
+    local procedure CallWebService(pActionPage: Enum "YVS Interface Document Type"; pPayload: Text;
+                                                    pJournalTemplate: code[10];
+                                                    pDicBatch: Dictionary of [code[20], List of [Integer]];
+                                                    pDirection: Option "Inbound","Outbound")
     var
         ltInventorySetup: Record "Inventory Setup";
         JsonMgt: Codeunit "JSON Management";
@@ -191,11 +322,17 @@ codeunit 75001 "YVS Api Func"
 
     end;
 
-    local procedure InsertToInterfaceLog(pStatus: Option "Success","Failed"; pActionPage: Enum "YVS Interface Document Type"; pJournalTemplate: code[10]; pDicBatch: Dictionary of [code[20], List of [Integer]];
-                                                                                                pPayload: Text; pDirection: Option "Inbound","Outbound"; pResponse: Text; pInterfacePath: Text[250]; pMethodType: Option " ","Insert","Update","Delete")
+    local procedure InsertToInterfaceLog(pStatus: Option "Success","Failed"; pActionPage: Enum "YVS Interface Document Type"; pJournalTemplate: code[10];
+                                                                                              pDicBatch: Dictionary of [code[20], List of [Integer]];
+                                                                                              pPayload: Text;
+                                                                                              pDirection: Option "Inbound","Outbound";
+                                                                                              pResponse: Text;
+                                                                                              pInterfacePath: Text[250];
+                                                                                              pMethodType: Option " ","Insert","Update","Delete")
     var
         InterfaceLogEntry: Record "YVS Interface Log Entry";
         ltTransferHeader: Record "Transfer Header";
+        ltTransferLine: Record "Transfer Line";
         ltITemJournalLine: Record "Item Journal Line";
         ltOutStram, ltOutStramResponse : OutStream;
         DocNo: Code[20];
@@ -226,11 +363,19 @@ codeunit 75001 "YVS Api Func"
                     ltITemJournalLine."YVS Send DateTime" := CurrentDateTime();
                     ltITemJournalLine.Modify();
                 end else begin
-                    InterfaceLogEntry."Primary Key Caption" := COPYSTR(ltTransferHeader.FieldCaption("No."), 1, 250);
-                    ltTransferHeader.GET(DocNo);
-                    InterfaceLogEntry."Primary Key 1" := ltTransferHeader."No.";
-                    InterfaceLogEntry."Document No." := ltTransferHeader."No.";
-
+                    if pActionPage = pActionPage::Transfer then begin
+                        ltTransferHeader.GET(DocNo);
+                        InterfaceLogEntry."Primary Key Caption" := COPYSTR(ltTransferHeader.FieldCaption("No."), 1, 250);
+                        InterfaceLogEntry."Primary Key 1" := ltTransferHeader."No.";
+                        InterfaceLogEntry."Document No." := ltTransferHeader."No.";
+                    end else begin
+                        ltTransferLine.GET(DocNo, LtLineNo);
+                        InterfaceLogEntry."Primary Key Caption" := COPYSTR(ltTransferLine.FieldCaption("Document No.") + ',' + ltTransferLine.FieldCaption("Line No."), 1, 250);
+                        InterfaceLogEntry."Primary Key 1" := ltTransferLine."Document No.";
+                        InterfaceLogEntry."Primary Key 2" := format(ltTransferLine."Line No.");
+                        InterfaceLogEntry."Document No." := ltTransferLine."Document No.";
+                        InterfaceLogEntry."Action Page" := InterfaceLogEntry."Action Page"::Transfer;
+                    end;
                     if pStatus = pStatus::Success then
                         ltTransferHeader."YVS Interface Completed" := true;
                     ltTransferHeader."YVS Send DateTime" := CurrentDateTime();
@@ -241,8 +386,10 @@ codeunit 75001 "YVS Api Func"
                 Clear(InterfaceLogEntry."Response Log");
                 InterfaceLogEntry."Json Log".CreateOutStream(ltOutStram, TextEncoding::UTF8);
                 ltOutStram.WriteText(pPayload);
-                InterfaceLogEntry."Response Log".CreateOutStream(ltOutStramResponse, TextEncoding::UTF8);
-                ltOutStramResponse.WriteText(pResponse);
+                if pResponse <> '' then begin
+                    InterfaceLogEntry."Response Log".CreateOutStream(ltOutStramResponse, TextEncoding::UTF8);
+                    ltOutStramResponse.WriteText(pResponse);
+                end;
                 InterfaceLogEntry.Modify();
             end;
         end;
