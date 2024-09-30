@@ -30,12 +30,12 @@
             "schemaUpdateMode": "ForceSync",
             "enableSqlInformationDebugger": true,
             "tenant": "a3f39fc8-3df5-4e7c-ae80-4f33b85d1e64"
-        },{
-            "name": "HH",
+        }, {
+            "name": "Dev",
             "request": "launch",
             "type": "al",
             "environmentType": "Sandbox",
-            "environmentName": "SandBox03",
+            "environmentName": "Dev",
             "startupObjectId": 22,
             "startupObjectType": "Page",
             "breakOnError": true,

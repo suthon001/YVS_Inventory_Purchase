@@ -33,23 +33,82 @@ pageextension 75000 "YVS Item Journal2" extends "Item Journal"
                 ToolTip = 'Specifies the value of the Status field.';
             }
         }
+        addafter(Description)
+        {
+            field("YVS Description TH"; rec."YVS Description TH")
+            {
+                ApplicationArea = all;
+                ToolTip = 'Specifies the value of the Description TH field.';
+            }
+            field("YVS Search Description"; rec."YVS Search Description")
+            {
+                ApplicationArea = all;
+                ToolTip = 'Specifies the value of the Search Description field.';
+            }
+            field("YVS Address"; rec."YVS Address")
+            {
+                ApplicationArea = all;
+                ToolTip = 'Specifies the value of the Address field.';
+            }
+            field("YVS Original Quantity"; rec."YVS Original Quantity")
+            {
+                ApplicationArea = all;
+                ToolTip = 'Specifies the value of the Original Quantity field.';
+            }
+        }
         addlast(Control1)
         {
-            field("YVS Send API"; Rec."YVS Send API")
+            field("YVS Ship-to Name"; Rec."YVS Ship-to Name")
+            {
+                ToolTip = 'Specifies the value of the Ship-to Name field.';
+                ApplicationArea = all;
+            }
+            field("YVS Ship-to Address"; Rec."YVS Ship-to Address")
+            {
+                ToolTip = 'Specifies the value of the Ship-to Address field.';
+                ApplicationArea = all;
+            }
+            field("YVS Ship-to District"; Rec."YVS Ship-to District")
+            {
+                ToolTip = 'Specifies the value of the Ship-to District field.';
+                ApplicationArea = all;
+            }
+            field("YVS Ship-to Post Code"; Rec."YVS Ship-to Post Code")
+            {
+                ToolTip = 'Specifies the value of the Ship-to Post Code field.';
+                ApplicationArea = all;
+            }
+            field("YVS Ship-to Phone No."; Rec."YVS Ship-to Phone No.")
+            {
+                ToolTip = 'Specifies the value of the Ship-to Phone No. field.';
+                ApplicationArea = all;
+            }
+            field("YVS Ship-to Mobile No."; Rec."YVS Ship-to Mobile No.")
+            {
+                ToolTip = 'Specifies the value of the Ship-to Mobile No. field.';
+                ApplicationArea = all;
+            }
+            field("YVS Shipment Date"; rec."YVS Shipment Date")
             {
                 ApplicationArea = all;
-                ToolTip = 'Specifies the value of the Send API field.';
+                ToolTip = 'Specifies the value of the Shipment Date field.';
             }
-            field("YVS Send By"; Rec."YVS Send By")
+            field("YVS Shipping Agent"; rec."YVS Shipping Agent")
             {
                 ApplicationArea = all;
-                ToolTip = 'Specifies the value of the Send By field.';
+                ToolTip = 'Specifies the value of the Shipping Agent field.';
             }
-            field("YVS Send DateTime"; Rec."YVS Send DateTime")
+            field("YVS Interface Completed"; rec."YVS Interface Completed")
             {
                 ApplicationArea = all;
-                ToolTip = 'Specifies the value of the Send DateTime field.';
+                ToolTip = 'Specifies the value of the Interface Completed field.';
             }
+            field("YVS Send DateTime"; rec."YVS Send DateTime")
+            {
+                ApplicationArea = all;
+                ToolTip = 'Specifies the value of the Send Date Time field.';
+            }
+
         }
     }
     actions
@@ -72,7 +131,7 @@ pageextension 75000 "YVS Item Journal2" extends "Item Journal"
                     ItemJnlLine.Copy(Rec);
                     ItemJnlLine.SetRange("Journal Template Name", rec."Journal Template Name");
                     ItemJnlLine.SetRange("Journal Batch Name", rec."Journal Batch Name");
-                    REPORT.RunModal(REPORT::"MRC Inventory Movement", true, true, ItemJnlLine);
+                    REPORT.RunModal(REPORT::"YVS Inventory Movement", true, true, ItemJnlLine);
                 end;
             }
         }
@@ -85,21 +144,78 @@ pageextension 75000 "YVS Item Journal2" extends "Item Journal"
 
         addfirst(processing)
         {
-            action(TESTJson)
+            action(InterfaceToPDA)
             {
-                Image = SendConfirmation;
+                Caption = 'Submit to PDA';
+                Image = Interaction;
                 ApplicationArea = all;
-                ToolTip = 'Executes the TEST Json action.';
-                Caption = 'Send API';
-                Visible = false;
+                ToolTip = 'Executes the Submit to PDA action.';
                 trigger OnAction()
                 var
                     ItemJournalLine: Record "Item Journal Line";
-                    InvenPurchFunc: Codeunit "YVS Inven & Purchase Func";
+                    YVSInterfaceLogEntry: Record "YVS Interface Log Entry";
+                    YVSFunc: Codeunit "YVS Api Func";
                 begin
-                    ItemJournalLine.Copy(rec);
+                    ItemJournalLine.reset();
+                    ItemJournalLine.copy(rec);
                     CurrPage.SetSelectionFilter(ItemJournalLine);
-                    InvenPurchFunc.CreateJsonItemJournal(ItemJournalLine);
+                    if ItemJournalLine.FindSet() then
+                        repeat
+                            ItemJournalLine.TestFieldAPI();
+                        until ItemJournalLine.Next() = 0;
+                    ItemJournalLine.reset();
+                    ItemJournalLine.copy(rec);
+                    CurrPage.SetSelectionFilter(ItemJournalLine);
+                    if ItemJournalLine.FindSet() then
+                        repeat
+                            YVSFunc.InterfaceItemJournalToPDA(rec);
+                        until ItemJournalLine.Next() = 0;
+
+                    YVSInterfaceLogEntry.reset();
+                    YVSInterfaceLogEntry.SetRange("Action Page", YVSInterfaceLogEntry."Action Page"::"Item Journal");
+                    YVSInterfaceLogEntry.SetRange("Primary Key 1", rec."Journal Template Name");
+                    YVSInterfaceLogEntry.SetRange("Primary Key 2", rec."Journal Batch Name");
+                    YVSInterfaceLogEntry.SetRange("Document No.", rec."Document No.");
+                    page.Run(0, YVSInterfaceLogEntry);
+                end;
+            }
+            action(ClearInterface)
+            {
+                Caption = 'Clear Interface';
+                Image = Cancel;
+                ApplicationArea = all;
+                ToolTip = 'Executes the Clear Interface  action.';
+                trigger OnAction()
+                var
+                    ItemJournalLine: Record "Item Journal Line";
+                begin
+                    ItemJournalLine.reset();
+                    ItemJournalLine.copy(rec);
+                    CurrPage.SetSelectionFilter(ItemJournalLine);
+                    if ItemJournalLine.FindSet() then
+                        repeat
+                            ItemJournalLine."YVS Interface Completed" := false;
+                            ItemJournalLine."YVS Send DateTime" := 0DT;
+                            ItemJournalLine.Modify();
+                        until ItemJournalLine.Next() = 0;
+
+                end;
+            }
+            action(LogInterfaceToPDA)
+            {
+                Caption = 'Log';
+                Image = Log;
+                ApplicationArea = all;
+                ToolTip = 'Executes the Log action.';
+                trigger OnAction()
+                var
+                    YVSInterfaceLogEntry: Record "YVS Interface Log Entry";
+                begin
+                    YVSInterfaceLogEntry.reset();
+                    YVSInterfaceLogEntry.SetRange("Primary Key 1", rec."Journal Template Name");
+                    YVSInterfaceLogEntry.SetRange("Primary Key 2", rec."Journal Batch Name");
+                    YVSInterfaceLogEntry.SetRange("Document No.", rec."Document No.");
+                    page.Run(0, YVSInterfaceLogEntry);
                 end;
             }
             group("ReleaseReOpen")
@@ -405,14 +521,24 @@ pageextension 75000 "YVS Item Journal2" extends "Item Journal"
                 actionref(CancelJournalLine_Promoted; "CancelJournal by Line") { }
             }
         }
-        modify(Category_Category13)
+        addafter(Category_Category6)
         {
-            Caption = 'API';
+            group(InterfaceTOPDAPromote)
+            {
+                Caption = 'API Management';
+                actionref(InterfaceToPDA_Promoted; InterfaceToPDA)
+                {
+                }
+                actionref(ClearInterface_Promoted; ClearInterface)
+                {
+                }
+                actionref(LogInterfaceToPDA_Promoted; LogInterfaceToPDA)
+                {
+                }
+            }
         }
-        addfirst(Category_Category13)
-        {
-            actionref(TESTJson_Promoted; "TESTJson") { }
-        }
+
+
         modify(Category_Category8)
         {
             Caption = 'Release';
