@@ -12,8 +12,7 @@ page 75004 "Interface Item Journal"
     EntityName = 'itemjournal';
     EntitySetName = 'itemjournals';
     PageType = API;
-    SourceTable = "Item Journal Line";
-    SourceTableTemporary = true;
+    SourceTable = "YVS Trans. Journal Buffer";
     DeleteAllowed = false;
     ModifyAllowed = false;
     layout
@@ -112,22 +111,44 @@ page 75004 "Interface Item Journal"
                             gvJsonObject.Add('locationCode', Rec."Location Code");
                     end;
                 }
-                field(bcEntryRef; Rec."YVS BC_Entry_Ref")
+                field(bcEntryRef; bcEntryRef)
                 {
                     Caption = 'BC Entry Ref';
+
                 }
             }
         }
     }
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     var
+        EnvironmentInformation: Codeunit "Environment Information";
+        InboundItemJournal: Text;
         APIfunc: Codeunit "YVS Api Func";
-        ItemJournalLine: Record "Item Journal Line";
+        ISSuccess: Boolean;
+        ltActionPage: Enum "YVS Interface Document Type";
+        ltDicBatch: Dictionary of [code[20], List of [Integer]];
+        ltDirection: Option "Inbound","Outbound";
+        ltMethodType: Option " ","Insert","Update","Delete";
+        JsonText: Text;
+        ltListOfInteger: List of [Integer];
+
     begin
-        if APIfunc.TryUpdateToItemJournal(gvJsonObject) then begin
-            ItemJournalLine.GET(rec."Journal Template Name", rec."Journal Batch Name", rec."Line No.");
-            rec := ItemJournalLine;
+        if EnvironmentInformation.IsProduction() then
+            InboundItemJournal := 'https://api.businesscentral.dynamics.com/v2.0/4ef4cef4-feda-4adf-a799-109703e11237/production/api/interface/bc/v1.0/itemjournals?company=''' + CompanyName() + ''
+        else
+            InboundItemJournal := 'https://api.businesscentral.dynamics.com/v2.0/4ef4cef4-feda-4adf-a799-109703e11237/' + EnvironmentInformation.GetEnvironmentName() + '/api/interface/bc/v1.0/itemjournals?company=''' + CompanyName() + '''';
+        gvJsonObject.WriteTo(JsonText);
+        ISSuccess := APIfunc.UpdateToITemJournal(rec."Journal Template Name", JsonText);
+        ltListOfInteger.Add(rec."Line No.");
+        ltDicBatch.Add(rec."Journal Batch Name", ltListOfInteger);
+        if ISSuccess then
+            APIfunc.InsertToInterfaceLog(0, ltActionPage::"Item Journal", rec."Journal Template Name", ltDicBatch, JsonText, ltDirection::Inbound, '', COPYSTR(InboundItemJournal, 1, 250), ltMethodType::Update, rec."Document No.", bcEntryRef)
+        else begin
+            APIfunc.InsertToInterfaceLog(1, ltActionPage::"Item Journal", rec."Journal Template Name", ltDicBatch, JsonText, ltDirection::Inbound, GetLastErrorText(), COPYSTR(InboundItemJournal, 1, 250), ltMethodType::Update, rec."Document No.", bcEntryRef);
+            Commit();
+            ERROR(GetLastErrorText());
         end;
+
     end;
 
     trigger OnOpenPage()
@@ -137,4 +158,6 @@ page 75004 "Interface Item Journal"
 
     var
         gvJsonObject: JsonObject;
+        bcEntryRef: Integer;
+
 }

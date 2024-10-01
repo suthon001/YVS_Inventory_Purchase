@@ -8,6 +8,7 @@ page 75002 "YVS Interface Log Entries"
     PageType = List;
     CardPageId = "YVS Interface Log Card";
     SourceTable = "YVS Interface Log Entry";
+    SourceTableView = sorting("Entry No.") order(descending);
     UsageCategory = History;
     InsertAllowed = false;
     ModifyAllowed = false;

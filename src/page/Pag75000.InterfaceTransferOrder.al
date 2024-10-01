@@ -12,17 +12,16 @@ page 75000 "YVS Interface Transfer Order"
     EntityName = 'transferOrder';
     EntitySetName = 'transferOrders';
     PageType = API;
-    SourceTable = "Transfer Line";
-    SourceTableTemporary = true;
+    SourceTable = "YVS Trans. Transfer Buffer";
     DeleteAllowed = false;
     ModifyAllowed = false;
     layout
     {
         area(Content)
         {
-            repeater(General)
+            Group(General)
             {
-                field(documentNo; Rec."Document No.")
+                field(documentNo; rec."Document No.")
                 {
                     Caption = 'Document No.';
                     trigger OnValidate()
@@ -31,16 +30,16 @@ page 75000 "YVS Interface Transfer Order"
                             gvJsonObject.Add('documentNo', rec."Document No.");
                     end;
                 }
-                field(lineNo; Rec."Line No.")
+                field(lineNo; rec."Line No.")
                 {
                     Caption = 'Line No.';
                     trigger OnValidate()
                     begin
-                        if Rec."Line No." <> 0 then
+                        if rec."Line No." <> 0 then
                             gvJsonObject.Add('lineNo', rec."Line No.");
                     end;
                 }
-                field(itemNo; Rec."Item No.")
+                field(itemNo; rec."Item No.")
                 {
                     Caption = 'Item No.';
                     trigger OnValidate()
@@ -49,7 +48,7 @@ page 75000 "YVS Interface Transfer Order"
                             gvJsonObject.Add('itemNo', rec."Item No.");
                     end;
                 }
-                field(quantityUpdate; Rec.Quantity)
+                field(quantityUpdate; rec.Quantity)
                 {
                     Caption = 'Quantity';
                     trigger OnValidate()
@@ -69,17 +68,36 @@ page 75000 "YVS Interface Transfer Order"
     }
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     var
+        EnvironmentInformation: Codeunit "Environment Information";
+        InboundTransferOrder: Text;
         APIfunc: Codeunit "YVS Api Func";
-        TransferHeader: Record "Transfer Header";
-        TransferLine: Record "Transfer Line";
+        ISSuccess: Boolean;
+        ltActionPage: Enum "YVS Interface Document Type";
+        ltDicBatch: Dictionary of [code[20], List of [Integer]];
+        ltDirection: Option "Inbound","Outbound";
+        ltMethodType: Option " ","Insert","Update","Delete";
+        JsonText: Text;
+        ltListOfInteger: List of [Integer];
+
     begin
-        if APIfunc.TryUpdateToTransferOrder(gvJsonObject) then begin
-            TransferHeader.GET(rec."Document No.");
-            TransferLine.GET(rec."Document No.", rec."Line No.");
-            rec := TransferLine;
-            bcEntryRef := TransferHeader."YVS BC_Entry_Ref";
+        if EnvironmentInformation.IsProduction() then
+            InboundTransferOrder := 'https://api.businesscentral.dynamics.com/v2.0/4ef4cef4-feda-4adf-a799-109703e11237/production/api/interface/bc/v1.0/transferOrders?company=''' + CompanyName() + ''
+        else
+            InboundTransferOrder := 'https://api.businesscentral.dynamics.com/v2.0/4ef4cef4-feda-4adf-a799-109703e11237/' + EnvironmentInformation.GetEnvironmentName() + '/api/interface/bc/v1.0/transferOrders?company=''' + CompanyName() + '''';
+        gvJsonObject.WriteTo(JsonText);
+        ISSuccess := APIfunc.UpdateToTransferOrder(JsonText);
+        ltListOfInteger.Add(rec."Line No.");
+        ltDicBatch.Add(rec."Document No.", ltListOfInteger);
+        if ISSuccess then
+            APIfunc.InsertToInterfaceLog(0, ltActionPage::"Transfer Line", '', ltDicBatch, JsonText, ltDirection::Inbound, '', COPYSTR(InboundTransferOrder, 1, 250), ltMethodType::Update, rec."Document No.", bcEntryRef)
+        else begin
+            APIfunc.InsertToInterfaceLog(1, ltActionPage::"Transfer Line", '', ltDicBatch, JsonText, ltDirection::Inbound, GetLastErrorText(), COPYSTR(InboundTransferOrder, 1, 250), ltMethodType::Update, rec."Document No.", bcEntryRef);
+            Commit();
+            ERROR(GetLastErrorText());
         end;
+
     end;
+
 
     trigger OnOpenPage()
     begin
@@ -87,6 +105,8 @@ page 75000 "YVS Interface Transfer Order"
     end;
 
     var
+
+
         bcEntryRef: Integer;
         gvJsonObject: JsonObject;
 }

@@ -1,6 +1,3 @@
-/// <summary>
-/// Unknown YVS_Inven_Purch_Perm (ID 75000).
-/// </summary>
 permissionset 75000 YVS_Inven_Purch_Perm
 {
     Assignable = true;
@@ -8,6 +5,10 @@ permissionset 75000 YVS_Inven_Purch_Perm
     Permissions =
         table "YVS Interface Log Entry" = X,
         tabledata "YVS Interface Log Entry" = RMID,
+        table "YVS Trans. Journal Buffer" = X,
+        tabledata "YVS Trans. Journal Buffer" = RMID,
+        table "YVS Trans. Transfer Buffer" = X,
+        tabledata "YVS Trans. Transfer Buffer" = RMID,
         table "YVS Posted Item Journal Line" = X,
         tabledata "YVS Posted Item Journal Line" = RMID,
         page "YVS Interface Transfer Order" = X,
