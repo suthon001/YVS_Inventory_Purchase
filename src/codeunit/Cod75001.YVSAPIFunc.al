@@ -230,6 +230,8 @@ codeunit 75001 "YVS Api Func"
     procedure InterfaceTransferToPDA(pTranferOrder: Record "Transfer Header")
     var
         ltTransferLine: Record "Transfer Line";
+        StoreLocation: Record "MRC Store Location";
+        ltCustomer: Record Customer;
         ltITem: Record Item;
         ltJsonObject, ltJsonObjectLine : JsonObject;
         ltJsonArray: JsonArray;
@@ -239,21 +241,25 @@ codeunit 75001 "YVS Api Func"
         ListOfInteger: List of [Integer];
         ltDirection: Option "Inbound","Outbound";
     begin
+        if not StoreLocation.GET(pTranferOrder."MRC Store Location") then
+            StoreLocation.Init();
+        if not ltCustomer.GET(pTranferOrder."MRC Retailer No.") then
+            ltCustomer.Init();
         ltJsonObject.Add('no', pTranferOrder."No.");
         ltJsonObject.Add('transferfromCode', pTranferOrder."Transfer-from Code");
         ltJsonObject.Add('transfertoCode', pTranferOrder."Transfer-to Code");
-        ltJsonObject.Add('retailerNo', '');
-        ltJsonObject.Add('retailerName', '');
-        ltJsonObject.Add('storeLocation', '');
-        ltJsonObject.Add('storeLocationName', '');
+        ltJsonObject.Add('retailerNo', pTranferOrder."MRC Retailer No.");
+        ltJsonObject.Add('retailerName', ltCustomer.Name);
+        ltJsonObject.Add('storeLocation', pTranferOrder."MRC Store Location");
+        ltJsonObject.Add('storeLocationName', StoreLocation."MRC Store Name");
         ltJsonObject.Add('shiptoName', pTranferOrder."YVS Ship-to Name");
         ltJsonObject.Add('shiptoAddress', pTranferOrder."YVS Ship-to Address");
         ltJsonObject.Add('shiptoDistrict', pTranferOrder."YVS Ship-to District");
         ltJsonObject.Add('shiptoPostcode', pTranferOrder."YVS Ship-to Post Code");
         ltJsonObject.Add('shiptoMobileNo', pTranferOrder."YVS Ship-to Mobile No.");
         ltJsonObject.Add('shiptoPhoneNo', pTranferOrder."YVS Ship-to Phone No.");
-        ltJsonObject.Add('storeContact', '');
-        ltJsonObject.Add('orderNo', pTranferOrder."External Document No.");
+        ltJsonObject.Add('storeContact', pTranferOrder."MRC Store Contact");
+        ltJsonObject.Add('orderNo', pTranferOrder."MRC Order No.");
         ltJsonObject.Add('documentDate', pTranferOrder."Posting Date");
         ltJsonObject.Add('shipmentDate', pTranferOrder."Shipment Date");
         ltJsonObject.Add('shippingAgent', pTranferOrder."Shipping Agent Code");

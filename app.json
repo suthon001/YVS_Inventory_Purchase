@@ -16,6 +16,11 @@
       "name": "Thai Localized",
       "publisher": "Yokogawa Votiva Solutions Co., Ltd.",
       "version": "24.0.2.7"
+    },{
+      "id": "b1763441-1e30-4466-bc51-391f79114c51",
+      "name": "YVS Consignment",
+      "publisher": "Yokogawa Votiva Solutions Co., Ltd.",
+      "version": "1.0.1.12"
     }
   ],
   "screenshots": [],

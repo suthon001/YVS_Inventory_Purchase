@@ -7,11 +7,7 @@ pageextension 75010 "YVS Transfer Order" extends "Transfer Order"
     {
         addlast(General)
         {
-            field("External Document No."; rec."External Document No.")
-            {
-                ApplicationArea = all;
-                ToolTip = 'Specifies the value of the External Document No. field.';
-            }
+
             field("YVS Direction"; rec."YVS Direction")
             {
                 ToolTip = 'Specifies the value of the Direction field.';
