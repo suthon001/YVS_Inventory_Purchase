@@ -81,10 +81,17 @@ pageextension 75010 "YVS Transfer Order" extends "Transfer Order"
                 var
                     TransferLine: Record "Transfer Line";
                     YVSInterfaceLogEntry: Record "YVS Interface Log Entry";
+                    InterfaceCard: Page "YVS Interface Log Card";
                     YVSFunc: Codeunit "YVS Api Func";
                 begin
                     rec.TestField("Transfer-to Code");
                     rec.TestField("Transfer-from Code");
+                    rec.TestField("YVS Ship-to Name");
+                    rec.TestField("YVS Ship-to Address");
+                    rec.TestField("YVS Ship-to District");
+                    rec.TestField("YVS Ship-to Post Code");
+                    rec.TestField("Shipping Agent Code");
+
                     TransferLine.reset();
                     TransferLine.SetRange("Document No.", rec."No.");
                     if TransferLine.FindSet() then
@@ -95,10 +102,15 @@ pageextension 75010 "YVS Transfer Order" extends "Transfer Order"
                         Error('Nothing to Send');
 
                     YVSFunc.InterfaceTransferToPDA(rec);
+                    CLEAR(InterfaceCard);
                     YVSInterfaceLogEntry.reset();
                     YVSInterfaceLogEntry.SetRange("Action Page", YVSInterfaceLogEntry."Action Page"::Transfer);
                     YVSInterfaceLogEntry.SetRange("Primary Key 1", rec."No.");
-                    page.Run(0, YVSInterfaceLogEntry);
+                    InterfaceCard.Editable := false;
+                    if YVSInterfaceLogEntry.FindLast() then
+                        InterfaceCard.SetRecord(YVSInterfaceLogEntry);
+                    InterfaceCard.Run();
+                    CLEAR(InterfaceCard);
                 end;
             }
             action(ClearInterface)

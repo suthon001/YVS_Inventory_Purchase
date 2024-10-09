@@ -101,6 +101,11 @@ codeunit 75001 "YVS Api Func"
         TransferOrder.SetRange("YVS Interface Completed", false);
         TransferOrder.SetFilter("Transfer-from Code", '<>%1', '');
         TransferOrder.SetFilter("Transfer-to Code", '<>%1', '');
+        TransferOrder.SetFilter("YVS Ship-to Name", '<>%1', '');
+        TransferOrder.SetFilter("YVS Ship-to address", '<>%1', '');
+        TransferOrder.SetFilter("YVS Ship-to Post Code", '<>%1', '');
+        TransferOrder.SetFilter("YVS Ship-to District", '<>%1', '');
+        TransferOrder.SetFilter("Shipping Agent Code", '<>%1', '');
         if TransferOrder.FindSet() then
             repeat
                 if TransferOrder.TransferLinesExist() then
@@ -222,6 +227,7 @@ codeunit 75001 "YVS Api Func"
                                                     pDicBatch: Dictionary of [code[20], List of [Integer]];
                                                     pDirection: Option "Inbound","Outbound"; pDocumentNo: code[20])
     var
+        TransferHeader: Record "Transfer Header";
         ltInventorySetup: Record "Inventory Setup";
         JsonMgt: Codeunit "JSON Management";
         gvHttpHeadersContent, contentHeaders : HttpHeaders;
@@ -235,9 +241,16 @@ codeunit 75001 "YVS Api Func"
         RefBC: Integer;
     begin
         ltInventorySetup.GET();
+        ltInventorySetup.TestField("YVS PDA Token");
         if pActionPage = pActionPage::Transfer then begin
-            ltInventorySetup.TestField("YVS To PDA URL (Transfer)");
-            Url := ltInventorySetup."YVS To PDA URL (Transfer)";
+            TransferHeader.GET(pDocumentNo);
+            if TransferHeader."YVS Direction" = TransferHeader."YVS Direction"::Order then begin
+                ltInventorySetup.TestField("YVS To PDA URL (Trans) Orders");
+                Url := ltInventorySetup."YVS To PDA URL (Trans) Orders";
+            end else begin
+                ltInventorySetup.TestField("YVS To PDA URL (Trans) Advice");
+                Url := ltInventorySetup."YVS To PDA URL (Trans) Advice";
+            end;
         end else begin
             ltInventorySetup.TestField("YVS To PDA URL (Item Journal)");
             Url := ltInventorySetup."YVS To PDA URL (Item Journal)";
@@ -247,7 +260,7 @@ codeunit 75001 "YVS Api Func"
         gvHttpContent.GetHeaders(contentHeaders);
         contentHeaders.Clear();
         contentHeaders.Add('Content-Type', 'application/json');
-        ContentHeaders.Add('Authorization', 'Bearer ' + ltBearer);
+        ContentHeaders.Add('x-api-key', ltInventorySetup."YVS PDA Token");
         gvHttpClient.Post(Url, gvHttpContent, gvHttpResponseMessage);
         gvHttpResponseMessage.Content.ReadAs(ResponseText);
         JsonMgt.InitializeObject(ResponseText);
@@ -255,6 +268,7 @@ codeunit 75001 "YVS Api Func"
             InsertToInterfaceLog(0, pActionPage, pJournalTemplate, pDicBatch, pPayload, pDirection, ResponseText, Url, ltMethodType::Insert, pDocumentNo, RefBC)
         else
             InsertToInterfaceLog(1, pActionPage, pJournalTemplate, pDicBatch, pPayload, pDirection, ResponseText, Url, ltMethodType::" ", pDocumentNo, RefBC);
+
 
     end;
 
@@ -317,8 +331,8 @@ codeunit 75001 "YVS Api Func"
                 end else begin
                     if pActionPage = pActionPage::Transfer then begin
                         InterfaceLogEntry."Primary Key Caption" := COPYSTR(ltTransferHeader.FieldCaption("No."), 1, 250);
-                        InterfaceLogEntry."Primary Key 1" := ltTransferHeader."No.";
-                        InterfaceLogEntry."Document No." := ltTransferHeader."No.";
+                        InterfaceLogEntry."Primary Key 1" := pDOcumentNo;
+                        InterfaceLogEntry."Document No." := pDOcumentNo;
                     end else begin
                         InterfaceLogEntry."Primary Key Caption" := 'Document No.,Line No.';
                         InterfaceLogEntry."Primary Key 1" := pDOcumentNo;

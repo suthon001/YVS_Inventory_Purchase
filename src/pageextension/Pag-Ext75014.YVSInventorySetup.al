@@ -24,9 +24,15 @@ pageextension 75014 "YVS Inventory Setup" extends "Inventory Setup"
                     Editable = false;
                     ToolTip = 'Specifies the value of the URL Inbound Item Journal field.';
                 }
-                field("YVS To PDA URL (Transfer)"; Rec."YVS To PDA URL (Transfer)")
+                field("YVS To PDA URL (Trans) Orders"; Rec."YVS To PDA URL (Trans) Orders")
                 {
                     Caption = 'URL Outbound Transfer Order';
+                    ApplicationArea = all;
+                    ToolTip = 'Specifies the value of the Interface To PDA URL (Transfer) field.';
+                }
+                field("YVS To PDA URL (Trans) Advice"; Rec."YVS To PDA URL (Trans) Advice")
+                {
+                    Caption = 'URL Outbound Transfer Advice';
                     ApplicationArea = all;
                     ToolTip = 'Specifies the value of the Interface To PDA URL (Transfer) field.';
                 }
@@ -35,6 +41,11 @@ pageextension 75014 "YVS Inventory Setup" extends "Inventory Setup"
                     Caption = 'URL Outbound Item Journal';
                     ApplicationArea = all;
                     ToolTip = 'Specifies the value of the Interface To PDA URL (Item Journal) field.';
+                }
+                field("YVS PDA Token"; Rec."YVS PDA Token")
+                {
+                    ApplicationArea = all;
+                    ToolTip = 'Specifies the value of the PDA Token field.';
                 }
             }
         }
